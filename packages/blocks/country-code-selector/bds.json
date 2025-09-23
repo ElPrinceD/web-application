@@ -1,0 +1,14 @@
+{
+  "mobile": [
+    {
+      "CountryCodeSelectorTable": {
+        "label": "CountryCodeSelectorTable"
+      }
+    },
+    {
+      "CountryCodeSelector": {
+        "label": "CountryCodeSelector"
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "mobile": [
+    {
+      "SocialMediaAccount": {
+        "label": "SocialMediaAccount"
+      }
+    },
+    {
+      "SocialMediaAccountRegistration": {
+        "label": "SocialMediaAccountRegistration"
+      }
+    },
+    {
+      "CustomGoogleLogInButton": {
+        "label": "CustomGoogleLogInButton"
+      }
+    },
+    {
+      "SocialMediaAccountLogin": {
+        "label": "SocialMediaAccountLogin"
+      }
+    },
+    {
+      "CustomFacebookLogInButton": {
+        "label": "CustomFacebookLogInButton"
+      }
+    }
+  ]
+}

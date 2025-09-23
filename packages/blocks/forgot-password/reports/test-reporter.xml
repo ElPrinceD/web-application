@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/ForgotPasswordOTP-scenario.steps.tsx">
+        <testCase name="ForgotPasswordOTP User navigates to ForgotPasswordOTP" duration="263"/>
+        <testCase name="ForgotPasswordOTP User navigates to ForgotPasswordOTP in web" duration="81"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/ForgotPasswordOTPWeb-scenario.steps.tsx">
+        <testCase name="OtpVerification User verifies OTP" duration="63"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/ForgotPassword-scenario.steps.tsx">
+        <testCase name="ForgotPassword User navigates to ForgotPassword" duration="150"/>
+        <testCase name="ForgotPassword User navigates to ForgotPassword with email id" duration="97"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/ForgotPasswordWeb-scenario.steps.tsx">
+        <testCase name="ForgotPasswordWeb Enter Email Account" duration="114"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/NewPasswordWeb-scenario.steps.tsx">
+        <testCase name="NewPasswordWeb Enter New Password" duration="158"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/forgot-password/__tests__/step-definitions/NewPassword-scenario.steps.tsx">
+        <testCase name="NewPassword User navigates to NewPassword" duration="323"/>
+    </file>
+</testExecutions>

@@ -1,0 +1,69 @@
+{
+  "id": "catalogue1",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/catalogue1",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Catalogue1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Catalogue1": {
+        "file": "Catalogue1.tsx",
+        "extends": "Catalogue1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Catalogue1Controller",
+            "path": "./Catalogue1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Catalogue1Controller"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Catalogue1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Catalogue1": {
+        "file": "Catalogue1.web.tsx",
+        "extends": "Catalogue1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Catalogue1Controller",
+            "path": "./Catalogue1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Catalogue1Controller"
+          }
+        ]
+      }
+    }
+  }
+}

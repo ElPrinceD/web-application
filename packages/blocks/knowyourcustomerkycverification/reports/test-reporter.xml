@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+    <file path="/Users/wovvmac/Desktop/Dating/datingappdemo-260453-react-native/src/packages/blocks/KnowYourCustomerKycVerification/__tests__/step-definitions/KnowYourCustomerKycVerifiedAccount2.steps.tsx">
+        <testCase name="KnowYourCustomerKycVerification User navigates to KnowYourCustomerKycVerifiedAccount2" duration="1182"/>
+    </file>
+    <file path="/Users/wovvmac/Desktop/Dating/datingappdemo-260453-react-native/src/packages/blocks/KnowYourCustomerKycVerification/__tests__/step-definitions/KnowYourCustomerKycVerification.steps.tsx">
+        <testCase name="KnowYourCustomerKycVerification User navigates to KnowYourCustomerKycVerification" duration="1467"/>
+    </file>
+    <file path="/Users/wovvmac/Desktop/Dating/datingappdemo-260453-react-native/src/packages/blocks/KnowYourCustomerKycVerification/__tests__/step-definitions/KnowYourCustomerKycVerifiedAccount2.web.steps.tsx">
+        <testCase name="KnowYourCustomerKycVerification User navigates to KnowYourCustomerKycVerifiedAccount2web" duration="85"/>
+    </file>
+    <file path="/Users/wovvmac/Desktop/Dating/datingappdemo-260453-react-native/src/packages/blocks/KnowYourCustomerKycVerification/__tests__/step-definitions/KnowYourCustomerKycVerification.web.steps.tsx">
+        <testCase name="KnowYourCustomerKycVerification User navigates to KnowYourCustomerKycVerificationweb" duration="188"/>
+    </file>
+</testExecutions>

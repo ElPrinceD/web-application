@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/BookNotaryRequest.steps.tsx">
+        <testCase name="BookNotaryRequest User navigates to BookNotaryRequest" duration="23"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/dashboard.steps.tsx">
+        <testCase name="dashboard User navigates to dashboard" duration="404"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/InviteForm.web.steps.tsx">
+        <testCase name="InviteForm User sees InviteForm" duration="359"/>
+        <testCase name="InviteForm should call setState with loader true when isOpen prop changes from false to true" duration="6"/>
+        <testCase name="InviteForm should not change loader state if isOpen does not change" duration="4"/>
+        <testCase name="InviteForm should not set loader to true when isOpen is false and remains false" duration="4"/>
+        <testCase name="InviteForm User navigates through the InviteForm flow" duration="38"/>
+        <testCase name="InviteForm Testing response handling and navigation" duration="7"/>
+        <testCase name="InviteForm Testing country code related functions" duration="9"/>
+        <testCase name="InviteForm Testing fees validation logic" duration="7"/>
+        <testCase name="InviteForm Testing form interactions and checkbox handling" duration="33"/>
+        <testCase name="InviteForm Testing form submission and notarisation method handling" duration="18"/>
+        <testCase name="InviteForm Testing client request API response handling" duration="8"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/MiniHeader.web.steps.tsx">
+        <testCase name="MiniHeader User sees MiniHeader" duration="40"/>
+        <testCase name="MiniHeader Notary User sees MiniHeader" duration="12"/>
+        <testCase name="MiniHeader User navigates to dashboard min header with  user service data" duration="7"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/BookNotaryRequest.web.steps.tsx">
+        <testCase name="BookNotaryRequest User navigates to BookNotaryRequest" duration="509"/>
+        <testCase name="BookNotaryRequest User navigates to BookNotaryRequest for edit" duration="250"/>
+        <testCase name="BookNotaryRequest Component updates with edit request data" duration="20"/>
+        <testCase name="BookNotaryRequest User navigates to BookNotaryRequest for invited request" duration="43"/>
+        <testCase name="BookNotaryRequest Component updates with accepted request data" duration="18"/>
+        <testCase name="BookNotaryRequest Transform data function handles different data formats" duration="5"/>
+        <testCase name="BookNotaryRequest Find next button text returns correct text for different states" duration="10"/>
+        <testCase name="BookNotaryRequest Guest user boooking the request" duration="50"/>
+        <testCase name="BookNotaryRequest Guest user boooking the request and validate guest email" duration="12"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/dashboard/__tests__/step-definitions/dashboard.web.steps.tsx">
+        <testCase name="Dashboard User navigates to Dashboard" duration="372"/>
+        <testCase name="Dashboard Notary User navigates to Dashboard after login" duration="37"/>
+        <testCase name="Dashboard User interacts with Draft status request" duration="59"/>
+        <testCase name="Dashboard End user interacts with notary invites" duration="135"/>
+    </file>
+</testExecutions>

@@ -1,0 +1,9 @@
+export const bell = require("../assets/bell.png");
+export const bells = require("../assets/bells.png");
+export const badgeBell = require("../assets/badgeBell.png");
+export const gridPencil = require("../assets/gridPencil.png");
+export const user = require("../assets/user.png");
+export const money = require("../assets/money.png");
+export const asterisks = require("../assets/asterisks.png");
+export const bookmark = require("../assets/bookmark.png");
+export const receipt = require("../assets/receipt.png");

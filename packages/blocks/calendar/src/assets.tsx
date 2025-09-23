@@ -1,0 +1,10 @@
+export const imgPasswordVisible = require("../assets/ic_password_visible.png");
+export const imgPasswordInVisible = require("../assets/ic_password_invisible.png");
+export const calendar2 = require("../assets/Calendar-amico.png");
+export const googleImg = require("../assets/google_image.png");
+export const outlookImg = require("../assets/outlook_image.png");
+export const renotaryImg = require("../assets/renotary.png");
+export const meetingHeadingIcon = require("../assets/topic.png");
+export const peopleIcon = require("../assets/people_outline.png");
+export const meetingDescIcon = require("../assets/format_align_left.png");
+export const darkBellIcon = require("../assets/Vector.png");

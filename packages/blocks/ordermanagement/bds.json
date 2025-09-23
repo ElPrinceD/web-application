@@ -1,0 +1,34 @@
+{
+  "bds": {
+    "name": "Order Management",
+    "id": "order-management",
+    "platform": [
+      "desktop",
+      "mobile"
+    ],
+    "author": "CMT",
+    "summary": null,
+    "license": "BSD",
+    "version": "1.0.1",
+    "pages": [
+      {}
+    ],
+    "mobile": [
+      {
+        "OrderDetailsView": {
+          "label": "OrderDetailsView"
+        }
+      },
+      {
+        "OrderManagementView": {
+          "label": "OrderManagementView"
+        }
+      },
+      {
+        "SelectAddressView": {
+          "label": "SelectAddressView"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "termsandconditions",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/termsandconditions",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Termsandconditions"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Termsandconditions": {
+        "file": "Termsandconditions.tsx",
+        "extends": "TermsandconditionsController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "TermsandconditionsController",
+            "path": "./TermsandconditionsController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./TermsandconditionsController"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Termsandconditions"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Termsandconditions": {
+        "file": "Termsandconditions.web.tsx",
+        "extends": "TermsandconditionsController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "TermsandconditionsController",
+            "path": "./TermsandconditionsController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./TermsandconditionsController"
+          }
+        ]
+      }
+    }
+  }
+}

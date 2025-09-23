@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Meeting Test - No CORS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .meeting-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .meeting-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .cors-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .cors-warning h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Zoom Meeting Test - CORS Bypass</h1>
+        
+        <div class="cors-warning">
+            <h3>⚠️ CORS Issue Detected</h3>
+            <p>This test page works around CORS issues by testing the Zoom SDK directly without making API calls to your backend.</p>
+        </div>
+        
+        <div class="meeting-info">
+            <h3>📋 Test Meeting Details</h3>
+            <p><strong>Meeting ID:</strong> 81413649668</p>
+            <p><strong>Password:</strong> 4JD2LT</p>
+            <p><strong>Join URL:</strong> <a href="https://us05web.zoom.us/j/81413649668?pwd=wk01rihNQbawXuZhK6CafkdqPB0Wrg.1" target="_blank">Direct Join Link</a></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Steps (No Backend API Calls)</h3>
+            <button onclick="testSDKLoading()">1. Test SDK Loading</button>
+            <button onclick="testSDKInitialization()">2. Test SDK Initialization</button>
+            <button onclick="testMeetingJoin()">3. Test Meeting Join (with mock signature)</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Manual Signature Test</h3>
+            <p>If you have a valid signature from your backend, paste it here:</p>
+            <input type="text" id="signatureInput" placeholder="Paste your JWT signature here..." />
+            <button onclick="testWithRealSignature()">Test with Real Signature</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="log" class="log">Ready to test... Click a test button above.</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Manual Tests</h3>
+            <button onclick="openDirectJoin()">Open Direct Join URL</button>
+            <button onclick="showMeetingDetails()">Show Meeting Details</button>
+            <button onclick="checkBrowserCompatibility()">Check Browser Compatibility</button>
+        </div>
+    </div>
+
+    <!-- Zoom SDK -->
+    <script src="https://source.zoom.us/zoom-meeting-1.9.9.min.js"></script>
+    
+    <script>
+        // Test configuration
+        const TEST_CONFIG = {
+            meetingId: '81413649668',
+            password: '4JD2LT',
+            joinUrl: 'https://us05web.zoom.us/j/81413649668?pwd=wk01rihNQbawXuZhK6CafkdqPB0Wrg.1',
+            sdkKey: '1wYDJ1zZRmOBWTKs66QKmQ',
+            sdkSecret: 'lGBIHUOB7ntMOpc54ecrZdhqcVinWySj',
+            userName: 'Test User',
+            userEmail: 'test@example.com'
+        };
+
+        // Logging function
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            logElement.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Log cleared. Ready for new tests.', 'info');
+        }
+
+        // Test 1: SDK Loading
+        function testSDKLoading() {
+            log('🧪 Testing Zoom SDK loading...', 'info');
+            
+            if (typeof ZoomMtg !== 'undefined') {
+                log('✅ Zoom SDK is loaded successfully', 'success');
+                log('📋 Available methods: ZoomMtg.init, ZoomMtg.join', 'info');
+                return true;
+            } else {
+                log('❌ Zoom SDK is not loaded', 'error');
+                log('💡 This might be because:', 'info');
+                log('   - Network connection issues', 'info');
+                log('   - Zoom CDN is down', 'info');
+                log('   - Browser blocked the script', 'info');
+                return false;
+            }
+        }
+
+        // Test 2: SDK Initialization (with mock signature)
+        function testSDKInitialization() {
+            log('🧪 Testing Zoom SDK initialization...', 'info');
+            
+            if (!testSDKLoading()) {
+                return;
+            }
+
+            // Create a mock signature for testing
+            const mockSignature = createMockSignature();
+            log('🔧 Using mock signature for testing', 'warning');
+            log(`📋 Mock signature: ${mockSignature.substring(0, 50)}...`, 'info');
+
+            const zoomConfig = {
+                sdkKey: TEST_CONFIG.sdkKey,
+                sdkSecret: TEST_CONFIG.sdkSecret,
+                meetingNumber: TEST_CONFIG.meetingId,
+                passWord: TEST_CONFIG.password,
+                userName: TEST_CONFIG.userName,
+                userEmail: TEST_CONFIG.userEmail,
+                tk: mockSignature, // 🔑 Using 'tk' parameter
+                success: (success) => {
+                    log('✅ Zoom SDK initialized successfully!', 'success');
+                    log('📋 SDK is ready for meeting join', 'info');
+                },
+                error: (error) => {
+                    log(`❌ Zoom SDK initialization failed: ${error.message || error}`, 'error');
+                    if (error.message && error.message.includes('Signature is invalid')) {
+                        log('🔧 This confirms the signature issue we need to fix!', 'warning');
+                        log('💡 The mock signature is invalid - we need a real one from your backend', 'info');
+                    }
+                }
+            };
+
+            log('🔧 Initializing SDK with config:', 'info');
+            log(`   SDK Key: ${zoomConfig.sdkKey}`, 'info');
+            log(`   Meeting ID: ${zoomConfig.meetingNumber}`, 'info');
+            log(`   Has Token: ${!!zoomConfig.tk}`, 'info');
+
+            ZoomMtg.init(zoomConfig);
+        }
+
+        // Test 3: Meeting Join (with mock signature)
+        function testMeetingJoin() {
+            log('🧪 Testing meeting join...', 'info');
+            
+            if (!testSDKLoading()) {
+                return;
+            }
+
+            const mockSignature = createMockSignature();
+            
+            // Initialize first
+            const zoomConfig = {
+                sdkKey: TEST_CONFIG.sdkKey,
+                sdkSecret: TEST_CONFIG.sdkSecret,
+                meetingNumber: TEST_CONFIG.meetingId,
+                passWord: TEST_CONFIG.password,
+                userName: TEST_CONFIG.userName,
+                userEmail: TEST_CONFIG.userEmail,
+                tk: mockSignature,
+                success: (success) => {
+                    log('✅ SDK initialized, attempting to join...', 'success');
+                    joinMeeting();
+                },
+                error: (error) => {
+                    log(`❌ SDK initialization failed: ${error.message || error}`, 'error');
+                }
+            };
+
+            ZoomMtg.init(zoomConfig);
+        }
+
+        // Join meeting function
+        function joinMeeting() {
+            const joinConfig = {
+                meetingNumber: TEST_CONFIG.meetingId,
+                userName: TEST_CONFIG.userName,
+                passWord: TEST_CONFIG.password,
+                success: (success) => {
+                    log('🎉 SUCCESS! Successfully joined meeting!', 'success');
+                    log('✅ Zoom meeting integration is working correctly!', 'success');
+                },
+                error: (error) => {
+                    log(`❌ Failed to join meeting: ${error.message || error}`, 'error');
+                    
+                    if (error.message && error.message.includes('Signature is invalid')) {
+                        log('🔧 Signature validation failed - this is the main issue', 'warning');
+                        log('💡 You need a valid signature from your backend', 'info');
+                    } else if (error.message && error.message.includes('timeout')) {
+                        log('⏰ Meeting join timeout - trying direct join URL', 'warning');
+                        openDirectJoin();
+                    } else if (error.message && error.message.includes('browser')) {
+                        log('🌐 Browser restriction detected', 'warning');
+                    }
+                }
+            };
+            
+            ZoomMtg.join(joinConfig);
+        }
+
+        // Test with real signature
+        function testWithRealSignature() {
+            const signature = document.getElementById('signatureInput').value.trim();
+            
+            if (!signature) {
+                log('❌ Please paste a valid signature first', 'error');
+                return;
+            }
+
+            log('🧪 Testing with real signature...', 'info');
+            log(`📋 Signature length: ${signature.length}`, 'info');
+            log(`📋 Signature preview: ${signature.substring(0, 50)}...`, 'info');
+
+            const zoomConfig = {
+                sdkKey: TEST_CONFIG.sdkKey,
+                sdkSecret: TEST_CONFIG.sdkSecret,
+                meetingNumber: TEST_CONFIG.meetingId,
+                passWord: TEST_CONFIG.password,
+                userName: TEST_CONFIG.userName,
+                userEmail: TEST_CONFIG.userEmail,
+                tk: signature, // 🔑 Using real signature
+                success: (success) => {
+                    log('✅ SDK initialized with real signature!', 'success');
+                    log('🎯 Attempting to join meeting...', 'info');
+                    joinMeeting();
+                },
+                error: (error) => {
+                    log(`❌ SDK initialization failed: ${error.message || error}`, 'error');
+                    if (error.message && error.message.includes('Signature is invalid')) {
+                        log('🔧 Even the real signature is invalid - check backend implementation', 'warning');
+                    }
+                }
+            };
+
+            ZoomMtg.init(zoomConfig);
+        }
+
+        // Create a mock signature for testing
+        function createMockSignature() {
+            // This is a mock JWT signature - it won't work for actual meeting join
+            // but it will help us test the SDK initialization
+            const header = btoa(JSON.stringify({alg: "HS256", typ: "JWT"}));
+            const payload = btoa(JSON.stringify({
+                iss: TEST_CONFIG.sdkKey,
+                exp: Math.floor(Date.now() / 1000) + 3600,
+                iat: Math.floor(Date.now() / 1000),
+                aud: "zoom",
+                appKey: TEST_CONFIG.sdkKey,
+                tokenExp: Math.floor(Date.now() / 1000) + 3600,
+                mn: TEST_CONFIG.meetingId,
+                role: 0
+            }));
+            const signature = "mock_signature_for_testing";
+            
+            return `${header}.${payload}.${signature}`;
+        }
+
+        // Manual test functions
+        function openDirectJoin() {
+            log('🔗 Opening direct join URL in new tab...', 'info');
+            window.open(TEST_CONFIG.joinUrl, '_blank');
+        }
+
+        function showMeetingDetails() {
+            log('📋 Meeting Details for Manual Entry:', 'info');
+            log(`   Meeting ID: ${TEST_CONFIG.meetingId}`, 'info');
+            log(`   Password: ${TEST_CONFIG.password}`, 'info');
+            log(`   Join URL: ${TEST_CONFIG.joinUrl}`, 'info');
+        }
+
+        function checkBrowserCompatibility() {
+            log('🌐 Checking browser compatibility...', 'info');
+            
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isChrome = userAgent.includes('chrome');
+            const isFirefox = userAgent.includes('firefox');
+            const isSafari = userAgent.includes('safari') && !userAgent.includes('chrome');
+            const isEdge = userAgent.includes('edge');
+            
+            if (isChrome) {
+                log('✅ Chrome detected - fully supported', 'success');
+            } else if (isFirefox) {
+                log('✅ Firefox detected - fully supported', 'success');
+            } else if (isEdge) {
+                log('✅ Edge detected - fully supported', 'success');
+            } else if (isSafari) {
+                log('⚠️ Safari detected - may have restrictions', 'warning');
+            } else {
+                log('⚠️ Unknown browser - compatibility uncertain', 'warning');
+            }
+            
+            // Check for popup blockers
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.close();
+                log('✅ Popup blocker test passed', 'success');
+            } else {
+                log('⚠️ Popup blocker detected - may affect meeting join', 'warning');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 Zoom Meeting Test Page Loaded (CORS Bypass)', 'success');
+            log('📋 This page tests Zoom SDK without backend API calls', 'info');
+            log('🔧 Click "Test SDK Loading" to start', 'info');
+        });
+    </script>
+</body>
+</html>

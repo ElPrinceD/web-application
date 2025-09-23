@@ -1,0 +1,69 @@
+{
+  "id": "splashscreen1",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/splashscreen1",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Splashscreen1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Splashscreen1": {
+        "file": "Splashscreen1.tsx",
+        "extends": "Splashscreen1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Splashscreen1Controller",
+            "path": "./Splashscreen1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Splashscreen1Controller"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Splashscreen1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Splashscreen1": {
+        "file": "Splashscreen1.web.tsx",
+        "extends": "Splashscreen1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Splashscreen1Controller",
+            "path": "./Splashscreen1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Splashscreen1Controller"
+          }
+        ]
+      }
+    }
+  }
+}

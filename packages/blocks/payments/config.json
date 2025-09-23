@@ -1,0 +1,69 @@
+{
+  "id": "payments",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/payments",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Payments"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Payments": {
+        "file": "Payments.tsx",
+        "extends": "PaymentsController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "PaymentsController",
+            "path": "./PaymentsController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./PaymentsController"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Payments"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Payments": {
+        "file": "Payments.web.tsx",
+        "extends": "PaymentsController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "PaymentsController",
+            "path": "./PaymentsController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./PaymentsController"
+          }
+        ]
+      }
+    }
+  }
+}

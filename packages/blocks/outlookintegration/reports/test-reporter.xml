@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/OutlookIntegration.steps.tsx">
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/AuthManager.steps.tsx">
+        <testCase name="AuthManager User signs in successfully" duration="3"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/GraphManager.steps.tsx">
+        <testCase name="GraphManager User integrate with MS Graph API" duration="11"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/EmailDetail.steps.tsx">
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/OutlookCalendar.steps.tsx">
+        <testCase name="OutlookCalendar User interacts with OutlookCalendar" duration="377"/>
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/OutlookIntegration.web.steps.tsx">
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/OutlookData.web.steps.tsx">
+    </file>
+    <file path="/data/home/ubuntu/Desktop/zoomnotary-401615-react/src/packages/blocks/outlookintegration/__tests__/step-definitions/OutlookCalendar.web.steps.tsx">
+        <testCase name="OutlookCalendar User navigates to OutlookCalendar" duration="78"/>
+    </file>
+</testExecutions>

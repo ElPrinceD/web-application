@@ -1,0 +1,69 @@
+{
+  "id": "adminconsole",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/adminconsole",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Adminconsole"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Adminconsole": {
+        "file": "Adminconsole.tsx",
+        "extends": "AdminconsoleController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "AdminconsoleController",
+            "path": "./AdminconsoleController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./AdminconsoleController"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Adminconsole"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Adminconsole": {
+        "file": "Adminconsole.web.tsx",
+        "extends": "AdminconsoleController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "AdminconsoleController",
+            "path": "./AdminconsoleController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./AdminconsoleController"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+export const imgPasswordVisible = require("../assets/ic_password_visible.png");
+export const imgPasswordInVisible = require("../assets/ic_password_invisible.png");
+export const Logo = require("../assets/loginLogo.svg");
+export const Arrow = require("../assets/Arrow.png");
+export const ad_card_1_Banner= require("../assets/ad_card_1_Banner.png")
+export const cardimage1= require("../assets/I_need_a_Notary.png")
+export const cardimage2= require("../assets/I_am_a_Notary.png")
+export const Warning = require("../assets/Warning.svg");
+export const Success = require("../assets/tick-circle.svg");
+export const Error = require("../assets/error.svg");
+export const successLogo = require("../assets/group_.png");
+export const VerificationLogo = require("../assets/group_1.png");
+export const image_button_icon_button_ = require("../assets/image_button_icon_button_.png");
+export const image001 = require("../assets/placeholder1.png");

@@ -1,0 +1,18 @@
+@media(max-width:767px){
+    .containerStyles{
+        max-height: inherit !important;
+        position: relative;
+padding-right: 15px;
+    }
+    .cantBox{flex-wrap: wrap;}
+    .textBox{
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding: 10px;
+    }
+    .scrollBar{
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}

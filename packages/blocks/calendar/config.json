@@ -1,0 +1,69 @@
+{
+  "id": "calendar",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/calendar",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Calendar"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Calendar": {
+        "file": "Calendar.tsx",
+        "extends": "CalendarController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "CalendarController",
+            "path": "./CalendarController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./CalendarController"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Calendar"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Calendar": {
+        "file": "Calendar.web.tsx",
+        "extends": "CalendarController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "CalendarController",
+            "path": "./CalendarController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./CalendarController"
+          }
+        ]
+      }
+    }
+  }
+}

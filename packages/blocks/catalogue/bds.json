@@ -1,0 +1,28 @@
+{
+  "bds": {
+    "name": "catalogue",
+    "id": "catalogue",
+    "platform": [
+      "desktop",
+      "mobile"
+    ],
+    "author": "CMT",
+    "summary": null,
+    "license": "BSD",
+    "version": "1.0.0",
+    "pages": [
+      {
+        "catalogue": {
+          "hotspots": []
+        }
+      }
+    ],
+    "mobile": [
+      {
+        "Catalogue": {
+          "label": "Catalogue"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "signuplogin",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/signuplogin",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Signuplogin"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Signuplogin": {
+        "file": "Signuplogin.tsx",
+        "extends": "SignuploginController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "SignuploginController",
+            "path": "./SignuploginController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./SignuploginController"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Signuplogin"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Signuplogin": {
+        "file": "Signuplogin.web.tsx",
+        "extends": "SignuploginController",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "SignuploginController",
+            "path": "./SignuploginController"
+          },
+          {
+            "value": "{Props}",
+            "path": "./SignuploginController"
+          }
+        ]
+      }
+    }
+  }
+}

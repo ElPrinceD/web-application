@@ -1,0 +1,403 @@
+.sectionLandingPageBanner{
+  margin-top: -97.77px;
+}
+.accordion-heading {
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  line-height: 38px !important;
+  letter-spacing: 0.0025em !important;
+  color: #060A14 !important;
+  text-align: center !important
+}
+.TimelineContentMainBox{
+  padding: 0 16px !important;
+}
+.accordion-timeline{
+  margin-right: 90px;
+  margin-top: 40px;
+}
+.accordion-content {
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  line-height: 145% !important;
+  letter-spacing: 0.0025em !important;
+  color: #64748B !important;
+  width: 316px;
+  /* height: 126px; */
+  margin-top: -20px !important;
+}
+
+.accordion-btn {
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  gap: 4px !important;
+  width: max-content;
+  height: 32px;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 4px !important;
+  margin-top: 8px !important;
+  margin-bottom: 15px !important;
+}
+
+.accordion-btnText {
+  width: 85px !important;
+  height: 24px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 24px !important;
+  color: #2D539F !important;
+}
+
+.side-BackGround-Effect-left {
+  position: absolute;
+  width: 268px;
+  height: 268px;
+  left: -134px;
+  background: #2F57A5;
+  filter: blur(80px);
+  opacity: .4;
+  top: -210px;
+}
+.side-BackGround-Effect-left.AppfooterBlurShadow{
+  top: initial;
+  bottom: 0px;
+}
+
+.side-BackGround-Effect-right {
+  position: absolute;
+  width: 268px;
+  height: 268px;
+  right: -134px;
+  background: #2F57A5;
+  filter: blur(80px);
+  opacity: .4;
+  bottom: 360px;
+}
+
+.left_bgImg {
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: -100px;
+}
+
+.bgDotsSmallimg_right {
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: -189px;
+  top: -70px;
+  z-index: -1;
+}
+.AboutUsVideoContent .bgDotsSmallimg_right{
+  left: -96px;
+  top: -76px;
+}
+
+.bgDotsSmallimg_left {
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: -408px;
+  left: -50px;
+  z-index: -1;
+}
+
+.bgBottomApplyNow {
+  position: absolute;
+  left: -110px;
+  top: -90px;
+  z-index: -1;
+}
+
+/* About Us Year Wise slider starts*/
+.aboutUsSlider {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dashedLine {
+  border-top: 1px dashed #D7E1F4;
+  width: 100%;
+}
+
+.yearwiseHeading {
+  font-size: 50px;
+  line-height: 60px;
+  font-weight: 500;
+}
+
+.yearWiseSubHeading {
+  color: var(--black-primary);
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+}
+
+.leftBox {
+  width: 500px;
+}
+
+.rightBoxRoot {
+  height: 175px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.rightBox {
+  width: 623px;
+}
+
+.rightBox .circles {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -12px;
+}
+
+.sliderMainContainer{
+    margin-top: 100px;
+    width: 1813px;
+    max-height: 320px;
+}
+
+.monthBoxesRoot {
+  width: 1813px;
+  height: 300px;
+}
+
+.upperMonthContainer {
+  height: 370px;
+}
+
+.monthBox {
+  margin-top: 32px;
+  height: 287px;
+  border-radius: 24px;
+  border: 1px solid #D7E1F4;
+  position: relative;
+  background: #F8FAFC;
+  max-width: 583px;
+}
+
+.monthBox h1 {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 86px;
+  line-height: 80px;
+  color: #FFFFFF;
+  position: absolute;
+  top: -34px;
+  left: 39px;
+  text-shadow: -1px -1px 0 #D7E1F4, 1px -1px 0 #D7E1F4, -1px 1px 0 #D7E1F4, 1px 1px 0 #D7E1F4;
+  letter-spacing: 4px;
+}
+
+.monthBox .innerContent {
+  position: absolute;
+  left: 38px;
+  bottom: 38px;
+}
+
+.monthBox .innerContent h3 {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 41px;
+  line-height: 49.2px;
+  color: #000000;
+}
+
+.monthBox .innerContent p {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #334155;
+  letter-spacing: 0.0025em;
+}
+
+.yearwiseTooltip {
+  padding: 4px 8px;
+  background: #2F57A5;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.tooltip{
+  background-color: red;
+  color: white;
+}
+
+/* About Us Year Wise slider ends*/
+
+  /* About us stepper start */
+
+  .TextMain{
+    width: 100%;
+    padding: 1px;
+    margin: 25px 0px                               
+  }
+
+  .sequenceNumber{
+    border-radius: 21%;
+    width: 15px;
+    display: flex;
+    justify-content: center;
+    margin-right: 15px !important;
+  }
+  /* About us stepper end */
+  .sectionStudentHelp .headingSubPadding, 
+   .textImageTop .headingSubPadding {
+    margin-bottom: 32px;
+   }
+
+@media (max-width: 1280px) {
+  .accordion-imageGrid {
+    display: none;
+  }
+  
+  .bgBottomApplyNow{
+    position: absolute;
+    left: -110px;
+    top: -90px;
+    z-index: -1;
+  }
+
+  .left_bgImg {
+    display: none;
+  }
+
+    /* About Us Year Wise slider starts*/
+    .aboutUsSlider {
+      flex-direction: column;
+    }
+    .leftBox{
+      width: auto;
+    }
+    .rightBoxRoot{
+      align-items: center;
+      height: 150px;
+    }
+    .monthBox{
+      max-width: 90vw;
+    }
+    .sliderMainContainer{
+      margin-top: 50px;
+    }
+    /* About Us Year Wise slider ends*/
+}
+
+@media (max-width: 768px) {
+  .bgDotsSmallimg_right {
+    display: none;
+  }
+
+  .bgDotsSmallimg_left {
+    display: none;
+  }
+
+  .bgBottomApplyNow {
+    display: none;
+  }
+
+  /* About Us Year Wise slider starts*/
+  .aboutUsSlider {
+    flex-direction: column;
+  }
+  .leftBox{
+    width: auto;
+  }
+  .rightBoxRoot{
+    align-items: center;
+    height: 150px;
+  }
+  .monthBox{
+    max-width: 90vw;
+  }
+  .sliderMainContainer{
+    margin-top: 50px;
+  }
+
+  /* .sectionStudentHelp .MuiTimelineItem-missingOppositeContent:before{
+    padding: 0px;
+  } */
+
+  /* About Us Year Wise slider ends*/
+
+  .accordion-timeline{
+    margin: 0px;
+  }
+  .accordion-heading {
+    font-size: 17px !important;
+    line-height: 24.65px !important;
+    margin-bottom: 8px !important;
+  }
+  .accordion-content{
+    min-width: 100%;
+    font-size: 13px !important;
+    line-height: 18.85px !important;
+    height: max-content;
+  }
+  .accordion-btn{
+    padding: 8px 15px 8px 0px !important;
+  }
+  .sectionStudentHelp .headingSubPadding{
+    margin-bottom: 15px;
+   }
+   .sectionStudentHelp .headingSubPadding, 
+   .textImageTop .headingSubPadding {
+    margin-bottom: 10px;
+   }
+  
+}
+
+@media (max-width: 568px) {
+  .accordion-content {
+    max-width: 100%;
+    font-weight: 400;
+    width: 250px !important;
+    height: auto !important;
+  }
+
+  .side-BackGround-Effect-left,
+  .side-BackGround-Effect-right {
+    width: 180px;
+    height: 180px;
+    z-index: -1;
+  }
+
+  /* About Us Year Wise slider starts*/
+  .aboutUsSlider {
+    flex-direction: column;
+  }
+  .leftBox{
+    width: auto;
+  }
+  .leftBox .yearwiseHeading{
+    font-size: 35px;
+  }
+  .rightBoxRoot{
+    align-items: center;
+    height: 150px;
+  }
+  .monthBox{
+    max-width: 90vw;
+  }
+  .sliderMainContainer{
+    margin-top: 75px;
+  }
+
+  /* About Us Year Wise slider ends*/
+}
+
+@media screen and (max-width:480px) {
+  .accordion-content {
+    height: 126px;
+  }
+}

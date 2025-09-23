@@ -1,0 +1,69 @@
+{
+  "id": "analytics1",
+  "version": "0.0.2",
+  "status": "preAlpha",
+  "path": "./packages/blocks/analytics1",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Analytics1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Analytics1": {
+        "file": "Analytics1.tsx",
+        "extends": "Analytics1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Analytics1Controller",
+            "path": "./Analytics1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Analytics1Controller"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Analytics1"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Analytics1": {
+        "file": "Analytics1.web.tsx",
+        "extends": "Analytics1Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Analytics1Controller",
+            "path": "./Analytics1Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Analytics1Controller"
+          }
+        ]
+      }
+    }
+  }
+}

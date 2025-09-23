@@ -1,0 +1,14 @@
+{
+  "id": "contentmanagement1",
+  "label": "contentmanagement1",
+  "author": "CMT",
+  "license": "BSD",
+  "summary": "",
+  "version": "2.0.0",
+  "platform": [
+    "desktop",
+    "mobile"
+  ],
+  "mobile": [],
+  "web": []
+}

@@ -1,0 +1,69 @@
+{
+  "id": "rolesandpermissions2",
+  "version": "1.1.0",
+  "status": "preAlpha",
+  "path": "./packages/blocks/rolesandpermissions2",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Rolesandpermissions2"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Rolesandpermissions2": {
+        "file": "Rolesandpermissions2.tsx",
+        "extends": "Rolesandpermissions2Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Rolesandpermissions2Controller",
+            "path": "./Rolesandpermissions2Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Rolesandpermissions2Controller"
+          }
+        ]
+      }
+    }
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [
+      "Rolesandpermissions2"
+    ],
+    "assembler-dependencies": [
+      "\"@react-native-picker/picker\": \"^2.5.0\""
+    ],
+    "catalog-dependencies": [
+      "core",
+      "utilities"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {
+      "Rolesandpermissions2": {
+        "file": "Rolesandpermissions2.web.tsx",
+        "extends": "Rolesandpermissions2Controller",
+        "ui-elements": [],
+        "imports": [
+          {
+            "value": "Rolesandpermissions2Controller",
+            "path": "./Rolesandpermissions2Controller"
+          },
+          {
+            "value": "{Props}",
+            "path": "./Rolesandpermissions2Controller"
+          }
+        ]
+      }
+    }
+  }
+}

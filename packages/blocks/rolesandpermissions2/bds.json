@@ -1,0 +1,14 @@
+{
+  "id": "rolesandpermissions2",
+  "label": "rolesandpermissions2",
+  "author": "CMT",
+  "license": "BSD",
+  "summary": "",
+  "version": "2.0.0",
+  "platform": [
+    "desktop",
+    "mobile"
+  ],
+  "mobile": [],
+  "web": []
+}

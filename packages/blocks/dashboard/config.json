@@ -1,0 +1,34 @@
+{
+  "id": "dashboard",
+  "version": "0.0.1",
+  "certificationType": "lite",
+  "status": "preAlpha",
+  "path": "./packages/blocks/dashboard",
+  "assembler-adapters": [],
+  "mobile": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [],
+    "assembler-dependencies": [
+      "\"react-native-responsive-screen\": \"1.4.2\"",
+      "\"react-native-responsive-fontsize\": \"0.5.1\""
+    ],
+    "catalog-dependencies": [
+      "core"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {}
+  },
+  "web": {
+    "merge-engine-navigation": {},
+    "assembler-exports": [],
+    "assembler-dependencies": [
+      "\"react-native-responsive-screen\": \"1.4.2\"",
+      "\"react-native-responsive-fontsize\": \"0.5.1\""
+    ],
+    "catalog-dependencies": [
+      "core"
+    ],
+    "assembler-devDependencies": [],
+    "merge-engine-screens": {}
+  }
+}

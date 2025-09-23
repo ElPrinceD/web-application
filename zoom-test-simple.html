@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Meeting Test - Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .meeting-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .meeting-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Zoom Meeting Test</h1>
+        
+        <div class="meeting-info">
+            <h3>📋 Test Meeting Details</h3>
+            <p><strong>Meeting ID:</strong> 81413649668</p>
+            <p><strong>Password:</strong> 4JD2LT</p>
+            <p><strong>Join URL:</strong> <a href="https://us05web.zoom.us/j/81413649668?pwd=wk01rihNQbawXuZhK6CafkdqPB0Wrg.1" target="_blank">Direct Join Link</a></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Steps</h3>
+            <button onclick="testStep1()">1. Test Signature Generation</button>
+            <button onclick="testStep2()">2. Test SDK Loading</button>
+            <button onclick="testStep3()">3. Test Complete Workflow</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="log" class="log">Ready to test... Click a test button above.</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Manual Tests</h3>
+            <button onclick="openDirectJoin()">Open Direct Join URL</button>
+            <button onclick="showMeetingDetails()">Show Meeting Details</button>
+        </div>
+    </div>
+
+    <!-- Zoom SDK -->
+    <script src="https://source.zoom.us/zoom-meeting-1.9.9.min.js"></script>
+    
+    <script>
+        // Test configuration
+        const TEST_CONFIG = {
+            meetingId: '81413649668',
+            password: '4JD2LT',
+            joinUrl: 'https://us05web.zoom.us/j/81413649668?pwd=wk01rihNQbawXuZhK6CafkdqPB0Wrg.1',
+            sdkKey: '1wYDJ1zZRmOBWTKs66QKmQ',
+            sdkSecret: 'lGBIHUOB7ntMOpc54ecrZdhqcVinWySj',
+            userName: 'Test User',
+            userEmail: 'test@example.com'
+        };
+
+        // Logging function
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            logElement.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Log cleared. Ready for new tests.', 'info');
+        }
+
+        // Test Step 1: Signature Generation
+        async function testStep1() {
+            log('🧪 Step 1: Testing signature generation...', 'info');
+            
+            try {
+                // Try to get token from localStorage (if available)
+                const token = localStorage.getItem('token') || 'test-token';
+                log(`Using token: ${token.substring(0, 20)}...`, 'info');
+                
+                const response = await fetch('/bx_block_cfzoomintegration92/zoom_meetings/generate_signature', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'Origin': window.location.origin
+                    },
+                    body: JSON.stringify({
+                        meeting_number: TEST_CONFIG.meetingId,
+                        role: 0
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                log(`✅ Signature generated successfully!`, 'success');
+                log(`📋 Signature length: ${data.signature.length} characters`, 'info');
+                log(`📋 Signature preview: ${data.signature.substring(0, 50)}...`, 'info');
+                
+                // Validate JWT format
+                const parts = data.signature.split('.');
+                if (parts.length === 3) {
+                    log(`✅ Signature is valid JWT format (3 parts)`, 'success');
+                } else {
+                    log(`⚠️ Signature is not JWT format (${parts.length} parts)`, 'warning');
+                }
+                
+                return data.signature;
+                
+            } catch (error) {
+                log(`❌ Signature generation failed: ${error.message}`, 'error');
+                log(`💡 This might be because:`, 'info');
+                log(`   - Backend server is not running`, 'info');
+                log(`   - Authentication token is invalid`, 'info');
+                log(`   - API endpoint is incorrect`, 'info');
+                throw error;
+            }
+        }
+
+        // Test Step 2: SDK Loading
+        async function testStep2() {
+            log('🧪 Step 2: Testing Zoom SDK loading...', 'info');
+            
+            if (typeof ZoomMtg !== 'undefined') {
+                log('✅ Zoom SDK is already loaded', 'success');
+                return true;
+            }
+
+            log('⏳ Zoom SDK not loaded yet, waiting...', 'info');
+            
+            // Wait a bit for the script to load
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            if (typeof ZoomMtg !== 'undefined') {
+                log('✅ Zoom SDK loaded successfully', 'success');
+                return true;
+            } else {
+                log('❌ Zoom SDK failed to load', 'error');
+                log('💡 This might be because:', 'info');
+                log('   - Network connection issues', 'info');
+                log('   - Zoom CDN is down', 'info');
+                log('   - Browser blocked the script', 'info');
+                return false;
+            }
+        }
+
+        // Test Step 3: Complete Workflow
+        async function testStep3() {
+            log('🧪 Step 3: Testing complete workflow...', 'info');
+            
+            try {
+                // Step 1: Get signature
+                const signature = await testStep1();
+                
+                // Step 2: Check SDK
+                const sdkLoaded = await testStep2();
+                if (!sdkLoaded) {
+                    throw new Error('SDK not loaded');
+                }
+                
+                // Step 3: Initialize SDK
+                log('🔧 Initializing Zoom SDK...', 'info');
+                
+                const zoomConfig = {
+                    sdkKey: TEST_CONFIG.sdkKey,
+                    sdkSecret: TEST_CONFIG.sdkSecret,
+                    meetingNumber: TEST_CONFIG.meetingId,
+                    passWord: TEST_CONFIG.password,
+                    userName: TEST_CONFIG.userName,
+                    userEmail: TEST_CONFIG.userEmail,
+                    tk: signature, // 🔑 CRITICAL: Using 'tk' not 'signature'
+                    success: (success) => {
+                        log('✅ Zoom SDK initialized successfully!', 'success');
+                        log('🎯 Attempting to join meeting...', 'info');
+                        joinMeeting();
+                    },
+                    error: (error) => {
+                        log(`❌ Zoom SDK initialization failed: ${error.message || error}`, 'error');
+                        if (error.message && error.message.includes('Signature is invalid')) {
+                            log('🔧 This is the signature issue we need to fix!', 'warning');
+                        }
+                    }
+                };
+                
+                log('📋 SDK Config:', 'info');
+                log(`   SDK Key: ${zoomConfig.sdkKey}`, 'info');
+                log(`   Meeting ID: ${zoomConfig.meetingNumber}`, 'info');
+                log(`   Has Token: ${!!zoomConfig.tk}`, 'info');
+                log(`   Token Preview: ${signature.substring(0, 30)}...`, 'info');
+                
+                ZoomMtg.init(zoomConfig);
+                
+            } catch (error) {
+                log(`❌ Complete workflow failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Join meeting function
+        function joinMeeting() {
+            const joinConfig = {
+                meetingNumber: TEST_CONFIG.meetingId,
+                userName: TEST_CONFIG.userName,
+                passWord: TEST_CONFIG.password,
+                success: (success) => {
+                    log('🎉 SUCCESS! Successfully joined meeting!', 'success');
+                    log('✅ Zoom meeting integration is working correctly!', 'success');
+                },
+                error: (error) => {
+                    log(`❌ Failed to join meeting: ${error.message || error}`, 'error');
+                    
+                    if (error.message && error.message.includes('Signature is invalid')) {
+                        log('🔧 Signature validation failed - this is the main issue', 'warning');
+                    } else if (error.message && error.message.includes('timeout')) {
+                        log('⏰ Meeting join timeout - trying direct join URL', 'warning');
+                        openDirectJoin();
+                    } else if (error.message && error.message.includes('browser')) {
+                        log('🌐 Browser restriction detected', 'warning');
+                    }
+                }
+            };
+            
+            ZoomMtg.join(joinConfig);
+        }
+
+        // Manual test functions
+        function openDirectJoin() {
+            log('🔗 Opening direct join URL in new tab...', 'info');
+            window.open(TEST_CONFIG.joinUrl, '_blank');
+        }
+
+        function showMeetingDetails() {
+            log('📋 Meeting Details for Manual Entry:', 'info');
+            log(`   Meeting ID: ${TEST_CONFIG.meetingId}`, 'info');
+            log(`   Password: ${TEST_CONFIG.password}`, 'info');
+            log(`   Join URL: ${TEST_CONFIG.joinUrl}`, 'info');
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🚀 Zoom Meeting Test Page Loaded', 'success');
+            log('📋 Ready to test Zoom meeting integration', 'info');
+            log('🔧 Click "Test Complete Workflow" to run all tests', 'info');
+        });
+    </script>
+</body>
+</html>
