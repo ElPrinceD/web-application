@@ -11,4 +11,5 @@ ReactDOM.render(
   </Router>,
   document.getElementById('root')
 );
-registerServiceWorker();
+// Disable service worker for now to avoid undefined script path error
+// registerServiceWorker();

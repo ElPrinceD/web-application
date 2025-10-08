@@ -100,11 +100,6 @@ module.exports = function override(config, env) {
   config.resolve.plugins = config.resolve.plugins.filter(
     plugin => plugin.constructor.name !== 'ModuleScopePlugin'
   )
-  
-  // Disable TypeScript checking for build
-  config.plugins = config.plugins.filter(plugin =>
-    plugin.constructor.name !== 'ForkTsCheckerWebpackPlugin'
-  )
   config.module.rules[0].include = appIncludes
   config.module.rules[1] = null
   config.module.rules[2].oneOf[1].include = appIncludes
@@ -131,10 +126,11 @@ module.exports = function override(config, env) {
     }),
   )
   config.resolve.alias = {
-    'react-native-maps': 'react-native-web-maps',
+    'react-native-maps': 'react-native-web-maps', 
     'react-native': 'react-native-web',
-    'react-native-web/dist/exports/MaskedViewIOS': 'react-native-web/dist/exports/View',
-    'react-native-web/dist/exports/AsyncStorage': 'react-native-web/dist/exports/View'
+    '@react-native-async-storage/async-storage': '@react-native-community/async-storage-backend-web',
+    'react-native-web/dist/exports/AsyncStorage': '@react-native-community/async-storage-backend-web',
+    'react-native-web/dist/exports/MaskedViewIOS': 'react-native-web/dist/exports/View'
   };
   return config
 }
