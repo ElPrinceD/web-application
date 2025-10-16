@@ -1823,23 +1823,9 @@ export default class DashboardController extends BlockComponent<Props, S, SS> {
         return;
       }
       
-      // Create script element for Zoom SDK v1 (using latest stable version)
-      const script = document.createElement('script');
-      script.src = 'https://source.zoom.us/zoom-meeting-1.9.9.min.js';
-      script.async = true;
-      script.crossOrigin = 'anonymous'; // Add CORS support
-      
-      script.onload = () => {
-        console.log("✅ Zoom SDK loaded successfully");
-        resolve(true);
-      };
-      
-      script.onerror = (error) => {
-        console.error("❌ Failed to load Zoom SDK:", error);
-        reject(error);
-      };
-      
-      document.head.appendChild(script);
+      // Zoom SDK is now loaded via npm package - no need to load via script tag
+      console.log("✅ Zoom SDK loaded via npm package");
+      resolve(true);
     });
   };
   

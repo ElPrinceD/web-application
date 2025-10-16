@@ -1,7 +1,7 @@
 "use strict";
 
 
-const baseURL = "https://api.renotary.uk";
+const baseURL = "http://localhost:3001";
 
 Object.defineProperty(exports, "__esModule", {
   value: true

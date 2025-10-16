@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom SDK Version Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Zoom SDK Version Test</h1>
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function testSDKVersion() {
+            addResult('Testing Zoom SDK version...', 'info');
+            
+            // Check if ZoomMtg is available
+            if (typeof window.ZoomMtg === 'undefined') {
+                addResult('❌ ZoomMtg is not available - SDK not loaded', 'error');
+                return;
+            }
+            
+            addResult('✅ ZoomMtg is available', 'success');
+            
+            // Check SDK version
+            if (window.ZoomMtg.VERSION) {
+                addResult(`✅ SDK Version: ${window.ZoomMtg.VERSION}`, 'success');
+            } else {
+                addResult('⚠️ SDK Version not available', 'info');
+            }
+            
+            // Check if it's the new SDK by looking for specific methods
+            if (typeof window.ZoomMtg.preLoadWasm === 'function') {
+                addResult('✅ preLoadWasm method available (v4.0.7+)', 'success');
+            } else {
+                addResult('❌ preLoadWasm method not available (old SDK)', 'error');
+            }
+            
+            if (typeof window.ZoomMtg.prepareWebSDK === 'function') {
+                addResult('✅ prepareWebSDK method available (v4.0.7+)', 'success');
+            } else {
+                addResult('❌ prepareWebSDK method not available (old SDK)', 'error');
+            }
+            
+            // Check for old SDK indicators
+            if (window.ZoomMtg.setZoomJSLib) {
+                addResult('⚠️ setZoomJSLib method found (indicates old SDK)', 'error');
+            }
+            
+            // Test signature generation
+            addResult('Testing signature generation...', 'info');
+            
+            // Mock signature test
+            const testSignature = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiIxd1lESjF6WlJtT0JXVEtzNjZRS21RIiwiYXBwS2V5IjoiMXdZREoxelpSbU9CV1RLczY2UUttUSIsIm1uIjoiODE0MTM2NDk2NjgiLCJyb2xlIjoxLCJpYXQiOjE3NjA2MjE0NjksImV4cCI6MTc2MDYyODY2OSwidG9rZW5FeHAiOjE3NjA2Mjg2Njl9.xpfLvm4187ua9oJGgv7Fnb0KOdidlHkLMKE--m5Cvac';
+            
+            // Decode JWT to check format
+            try {
+                const parts = testSignature.split('.');
+                if (parts.length === 3) {
+                    const payload = JSON.parse(atob(parts[1]));
+                    addResult('✅ JWT signature format is valid', 'success');
+                    addResult(`✅ JWT payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+                    
+                    // Check if it has the right fields for v4.0.7
+                    if (payload.sdkKey && payload.mn && payload.role !== undefined) {
+                        addResult('✅ JWT has correct fields for v4.0.7', 'success');
+                    } else {
+                        addResult('❌ JWT missing required fields for v4.0.7', 'error');
+                    }
+                } else {
+                    addResult('❌ JWT signature format is invalid', 'error');
+                }
+            } catch (e) {
+                addResult(`❌ Error decoding JWT: ${e.message}`, 'error');
+            }
+        }
+
+        // Run test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(testSDKVersion, 1000);
+        });
+    </script>
+</body>
+</html>

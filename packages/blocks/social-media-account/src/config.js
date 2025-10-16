@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.createAccountURL = "account/accounts";
-exports.loginAccountURL = "login/login";
+exports.loginAccountURL = "bx_block_login/logins";
 exports.urlHeaderTypeJSON = "application/json";
 exports.postHttpRequest = "POST";
 

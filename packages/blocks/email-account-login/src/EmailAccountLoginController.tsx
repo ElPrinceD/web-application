@@ -409,6 +409,15 @@ export default class EmailAccountLoginController extends BlockComponent<
       }
     }
     handleFailureResponse(response:any){      
+      // Check if response and errors exist
+      if(!response || !response.errors || !Array.isArray(response.errors) || response.errors.length === 0) {
+        this.setState({            
+          emailError2:"Login failed. Please try again.",
+          IsVerifiedNotaryUser:false
+        })
+        return;
+      }
+      
       if(!response.errors[0]?.role){     
         
         if(response.errors[0].failed_login === "Account not found" ){

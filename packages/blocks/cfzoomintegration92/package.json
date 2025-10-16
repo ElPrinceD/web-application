@@ -16,7 +16,7 @@
     ]
   },
   "resolutions": {
-    "cheerio":"<1.0.0",
+    "cheerio": "<1.0.0",
     "@types/react": "file:../core/node_modules/@types/react",
     "@types/react-native": "file:../core/node_modules/@types/react-native"
   },
@@ -56,7 +56,7 @@
     "typescript": "4.1.3"
   },
   "dependencies": {
-    "@zoomus/websdk": "^2.18.3",
+    "@zoom/meetingsdk": "^4.0.7",
     "cheerio": "<1.0.0"
   },
   "jestSonar": {

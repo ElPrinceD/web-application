@@ -102,11 +102,11 @@ export default class FooterController extends BlockComponent<
       );
 
       if (apiRequestid === this.allPartnersId) {
-        this.handleAllPartner(response.data)
+        this.handleAllPartner(response?.data)
       }
 
       if (apiRequestid === this.socialMediaId) {
-        this.handleSocialMedia(response.data)
+        this.handleSocialMedia(response?.data)
       }
     }
   }

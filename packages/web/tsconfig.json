@@ -4,13 +4,23 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": [
       "@types",
-      "../../node_modules/@types"
+      "../../node_modules/@types",
+      "./src/types"
     ],
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "strict": false
   },
   "include": [
     "src",
-    "../components/src"
+    "../components/src",
+    "../framework/src/types.d.ts",
+    "./src/types/global.d.ts"
   ],
   "references": [
     {

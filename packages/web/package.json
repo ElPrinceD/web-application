@@ -28,7 +28,8 @@
     "react-share": "file:../blocks/core/node_modules/react-share",
     "react-to-print": "file:../blocks/core/node_modules/react-to-print",
     "react-rte": "file:../blocks/core/node_modules/react-rte",
-    "html-react-parser": "file:../blocks/core/node_modules/html-react-parser"
+    "html-react-parser": "file:../blocks/core/node_modules/html-react-parser",
+    "@zoom/meetingsdk": "^4.0.7"
   },
   "scripts": {
     "compile": "tsc -b",

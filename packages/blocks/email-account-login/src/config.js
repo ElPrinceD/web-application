@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.urlGetValidations = "profile/validations";
 exports.validationApiContentType = "application/json";
 exports.validationApiMethodType = "GET";
-exports.loginAPiEndPoint = "login/login";
+exports.loginAPiEndPoint = "bx_block_login/logins";
 exports.loginAPiMethod = "POST";
 exports.loginApiContentType = "application/json";
 

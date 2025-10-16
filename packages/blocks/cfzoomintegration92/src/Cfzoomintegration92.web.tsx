@@ -150,14 +150,13 @@ export default class Cfzoomintegration92 extends Cfzoomintegration92Controller {
             width={this.findMainBoxWidth()}
             style={{ backgroundColor: "#F9F9F9" }}
           >
-            
+            <ZoomContainer>
               <div id="zoom-meeting-container">
                 <div id="zmmtg-root"></div>
                 <div id="aria-notify-area"></div>
                 <div id="meetingSDKElement"></div>
               </div>
-
-            
+            </ZoomContainer>
           </MainBox>
         </Box> </>
       // Customizable Area End
@@ -225,6 +224,23 @@ const MainBox = styled(Box)({
   "@media (min-width: 1025px)": {
     width: "calc(100vw - 200px)",
   },
+});
+
+const ZoomContainer = styled(Box)({
+  width: "100%",
+  height: "100vh",
+  position: "relative",
+  "& #zmmtg-root": {
+    display: "none",
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  },
+  "& #zoom-meeting-container": {
+    width: "100%",
+    height: "100%",
+    position: "relative",
+  }
 });
 const MainContentBox = styled(Box)({
   "@media (min-width: 1025px)": {

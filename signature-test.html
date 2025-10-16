@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Signature Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Zoom Signature Generation Test</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Test Configuration</h3>
+        <p>This page tests the signature generation for Zoom Meeting SDK v4.0.7</p>
+        <p><strong>API Key:</strong> 9KqEY0EZFoad7s8sq7GkyEsZ30Bgydd0qkhV</p>
+        <p><strong>Meeting Number:</strong> 97843021700</p>
+        <p><strong>Role:</strong> 0 (Participant)</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Test Controls</h3>
+        <button onclick="testSignatureGeneration()">Test Signature Generation</button>
+        <button onclick="testSignatureFormat()">Test Signature Format</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        // Your PHP signature generation logic converted to JavaScript
+        function generateSignature(apiKey, apiSecret, meetingNumber, role) {
+            const time = Math.floor(Date.now() / 1000) * 1000 - 30000; // time in milliseconds
+            
+            const data = btoa(apiKey + meetingNumber + time + role);
+            const hash = CryptoJS.HmacSHA256(data, apiSecret);
+            const hashBase64 = CryptoJS.enc.Base64.stringify(hash);
+            
+            const signature = apiKey + "." + meetingNumber + "." + time + "." + role + "." + hashBase64;
+            
+            return signature;
+        }
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-section ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function testSignatureGeneration() {
+            addResult('Testing signature generation...', 'info');
+            
+            try {
+                const apiKey = '9KqEY0EZFoad7s8sq7GkyEsZ30Bgydd0qkhV';
+                const apiSecret = 'YKdG78n3qaAwTYSCF56kkz29YyDQlyK9IEkf';
+                const meetingNumber = '97843021700';
+                const role = 0;
+                
+                const signature = generateSignature(apiKey, apiSecret, meetingNumber, role);
+                
+                addResult('✅ Signature generated successfully', 'success');
+                addResult(`<strong>Generated Signature:</strong><br><pre>${signature}</pre>`, 'info');
+                
+                // Test signature format
+                const parts = signature.split('.');
+                if (parts.length === 5) {
+                    addResult('✅ Signature has correct format (5 parts)', 'success');
+                    addResult(`<strong>Signature Parts:</strong><br>
+                        <pre>API Key: ${parts[0]}
+Meeting Number: ${parts[1]}
+Timestamp: ${parts[2]}
+Role: ${parts[3]}
+Hash: ${parts[4]}</pre>`, 'info');
+                } else {
+                    addResult(`❌ Signature format incorrect. Expected 5 parts, got ${parts.length}`, 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Signature generation error: ${error.message}`, 'error');
+            }
+        }
+
+        function testSignatureFormat() {
+            addResult('Testing signature format validation...', 'info');
+            
+            const testSignature = '9KqEY0EZFoad7s8sq7GkyEsZ30Bgydd0qkhV.97843021700.1697452800000.0.abc123';
+            const parts = testSignature.split('.');
+            
+            if (parts.length === 5) {
+                addResult('✅ Signature format is correct', 'success');
+                
+                // Validate each part
+                if (parts[0].length > 0) {
+                    addResult('✅ API Key part is present', 'success');
+                } else {
+                    addResult('❌ API Key part is missing', 'error');
+                }
+                
+                if (parts[1].length > 0) {
+                    addResult('✅ Meeting Number part is present', 'success');
+                } else {
+                    addResult('❌ Meeting Number part is missing', 'error');
+                }
+                
+                if (parts[2].length > 0) {
+                    addResult('✅ Timestamp part is present', 'success');
+                } else {
+                    addResult('❌ Timestamp part is missing', 'error');
+                }
+                
+                if (parts[3].length > 0) {
+                    addResult('✅ Role part is present', 'success');
+                } else {
+                    addResult('❌ Role part is missing', 'error');
+                }
+                
+                if (parts[4].length > 0) {
+                    addResult('✅ Hash part is present', 'success');
+                } else {
+                    addResult('❌ Hash part is missing', 'error');
+                }
+                
+            } else {
+                addResult(`❌ Signature format incorrect. Expected 5 parts, got ${parts.length}`, 'error');
+            }
+        }
+
+        // Load CryptoJS for HMAC-SHA256
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js';
+        script.onload = function() {
+            addResult('🚀 CryptoJS loaded successfully', 'success');
+            addResult('Ready to test signature generation', 'info');
+        };
+        script.onerror = function() {
+            addResult('❌ Failed to load CryptoJS library', 'error');
+        };
+        document.head.appendChild(script);
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            addResult('🚀 Zoom Signature Test Page Loaded', 'info');
+            addResult('Click "Test Signature Generation" to verify the signature format', 'info');
+        });
+    </script>
+</body>
+</html>
