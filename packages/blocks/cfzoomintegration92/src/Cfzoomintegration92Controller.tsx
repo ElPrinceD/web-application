@@ -331,7 +331,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
         return;
       }
       console.log('✅ Step 1: Zoom SDK found on window object');
-
+  
       // Step 2: Validate SDK methods
       if (typeof (window as any).ZoomMtg.preLoadWasm !== 'function') {
         console.error('❌ CRITICAL: ZoomMtg.preLoadWasm is not a function');
@@ -354,7 +354,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
         return;
       }
       console.log('✅ Step 2: All required Zoom SDK methods available');
-
+  
       // Step 3: Validate meeting parameters
       if (!this.state.sdkKey) {
         console.error('❌ CRITICAL: SDK Key is missing');
@@ -372,7 +372,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
         return;
       }
       console.log('✅ Step 3: Meeting parameters validated');
-
+  
       // Step 4: Pre-load SDK assets (CRITICAL for SDK 4.0.7)
       console.log('🔄 Step 4: Pre-loading Zoom SDK assets...');
       try {
@@ -383,7 +383,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
         this.setState({ loader: false });
         return;
       }
-
+  
       try {
         ZoomMtg.prepareWebSDK();
         console.log('✅ Step 4b: prepareWebSDK() completed');
@@ -392,7 +392,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
         this.setState({ loader: false });
         return;
       }
-
+  
       // Step 5: Show meeting container
       const zoomRoot = document.getElementById("zmmtg-root");
       if (zoomRoot) {
@@ -472,7 +472,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
             });
             
             console.log('🔍 JWT Payload Keys:', Object.keys(payload));
-
+    
             // Verify critical fields
             const now = Math.floor(Date.now() / 1000);
             const timeDiff = payload.iat - now;
@@ -485,7 +485,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
               isExpired: payload.exp < now,
               timeUntilExpiry: payload.exp - now + ' seconds'
             });
-
+    
             // Check for common issues
             if (payload.appKey !== this.state.sdkKey) {
               console.error('❌ JWT appKey mismatch!');
@@ -501,18 +501,18 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
                 console.error('Backend JWT payload is incorrect');
               }
             }
-
+    
             if (payload.mn.toString() !== cleanMeetingNumber) {
               console.error('❌ JWT meeting number mismatch!');
               console.error('Expected:', cleanMeetingNumber);
               console.error('Got:', payload.mn);
             }
-
+    
             if (Math.abs(timeDiff) > 300) {
               console.error('❌ JWT timestamp too far off!');
               console.error('Difference:', timeDiff, 'seconds');
             }
-
+    
             if (payload.exp < now) {
               console.error('❌ JWT signature expired!');
               console.error('Expired at:', new Date(payload.exp * 1000).toISOString());
@@ -522,7 +522,7 @@ export default class Cfzoomintegration92Controller extends BlockComponent<
           console.error('❌ Error decoding JWT:', error);
         }
       }
-
+    
       // Step 3: Prepare join parameters (SDK 4.0.7 format)
       console.log('✅ Step 3: Preparing join parameters');
       console.log('📋 Using JWT signature from backend:', this.state.signature?.substring(0, 50) + '...');

@@ -54,6 +54,11 @@ interface S {
   serviceData: Array<DataofService>;
   sender_url: string;
   zoomModal:boolean;
+  // Zoom meeting data
+  sdkKey: string;
+  signature: string;
+  meetingNumber: string;
+  password: string;
 }
 
 interface SS {
@@ -67,6 +72,7 @@ export default class DocusignIntegrationController extends BlockComponent<
 > {
   getProfileApiCallId: string = "";
   getServicesApiCallId: string = "";
+  zoomMeetingApiCallId: string = "";
 
   constructor(Props: Props) {
     super(Props);
@@ -93,6 +99,11 @@ export default class DocusignIntegrationController extends BlockComponent<
       serviceData: [],
       sender_url: "",
       zoomModal:false,
+      // Zoom meeting data
+      sdkKey: "",
+      signature: "",
+      meetingNumber: "",
+      password: "",
     };
 
     runEngine.attachBuildingBlock(this as IBlock, this.subScribedMessages);
@@ -129,6 +140,15 @@ export default class DocusignIntegrationController extends BlockComponent<
           case this.getServicesApiCallId:
             this.setState({ serviceData: responseJson.data });
             break;
+          case this.zoomMeetingApiCallId:
+            console.log('Zoom meeting data received:', responseJson.zoom_meetings);
+            this.setState({
+              sdkKey: responseJson.zoom_meetings.zoom_sdk_key,
+              signature: responseJson.zoom_meetings.signature,
+              meetingNumber: responseJson.zoom_meetings.meeting_number.toString(),
+              password: responseJson.zoom_meetings.meeting?.password || "",
+            });
+            break;
         }
       }
     }
@@ -146,6 +166,43 @@ export default class DocusignIntegrationController extends BlockComponent<
         ) as HTMLIFrameElement;
         iframe.style.display = "block";
       });
+    }
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: S) {
+    // Protect DocuSign iframe when Zoom modal is shown
+    if (this.state.zoomModal && !prevState.zoomModal) {
+      setTimeout(() => {
+        const docusignIframe = document.getElementById("docusign-iframe");
+        if (docusignIframe) {
+          docusignIframe.style.zIndex = "2";
+          docusignIframe.style.position = "relative";
+          docusignIframe.style.pointerEvents = "auto";
+          docusignIframe.style.display = "block";
+          docusignIframe.style.visibility = "visible";
+          docusignIframe.style.opacity = "1";
+          console.log("✅ DocuSign iframe protected in componentDidUpdate");
+          
+          // Ensure iframe content is loaded
+          const iframe = docusignIframe as HTMLIFrameElement;
+          if (iframe.src && this.state.sender_url) {
+            // Force iframe to reload if content is not visible
+            const checkContent = () => {
+              try {
+                if (iframe.contentDocument && iframe.contentDocument.body.innerHTML.trim() === '') {
+                  console.log("🔄 Reloading DocuSign iframe content...");
+                  iframe.src = this.state.sender_url;
+                }
+              } catch (e) {
+                // Cross-origin access denied, which is normal
+              }
+            };
+            
+            // Check after a delay to allow iframe to load
+            setTimeout(checkContent, 1000);
+          }
+        }
+      }, 100);
     }
   }
 
@@ -216,5 +273,14 @@ export default class DocusignIntegrationController extends BlockComponent<
   bookNowYesButtonClick = () => this.setState({ cancelBookNowReqModal: false });
 
   setLoader = (value: boolean) => this.setState({ loader: value });
+
+  getZoomMeetingData = async () => {
+    console.log('Fetching Zoom meeting data for notary request:', this.state.notaryRequestId);
+    this.zoomMeetingApiCallId = await this.apiCall({
+      contentType: "application/json",
+      method: "GET",
+      endPoint: `bx_block_cfzoomintegration92/zoom_meetings?notary_request_id=${this.state.notaryRequestId}`,
+    });
+  };
 }
 // Customizable Area End
