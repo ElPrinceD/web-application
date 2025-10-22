@@ -603,12 +603,13 @@ handleSearchChange = (event: { target: { value: any; }; }) => {
     if (apiRequestCallId === this.getPopularNotaryApiCallId) {
       this.setLoader(false);
 
-      this.setState({ popularNotariesData: responseJson.data });
+      // Ensure we always set an array, even if responseJson.data is undefined
+      this.setState({ popularNotariesData: Array.isArray(responseJson.data) ? responseJson.data : [] });
     }
    
     if (apiRequestCallId === this.getPopularServicApiCallId) {
-
-      this.setState({ PoplarServiceseData: responseJson.data.data }, ()=>      console.log('???????????????????',this.state.PoplarServiceseData)
+      // Ensure we always set an array, even if responseJson.data.data is undefined
+      this.setState({ PoplarServiceseData: Array.isArray(responseJson.data?.data) ? responseJson.data.data : [] }, ()=>      console.log('???????????????????',this.state.PoplarServiceseData)
     );
     }
     if (apiRequestCallId === this.getjurisdictionApiCallID) {
@@ -616,15 +617,15 @@ handleSearchChange = (event: { target: { value: any; }; }) => {
          this.setLoader(false)
 
         this.setState(() => ({
-          accountData: responseJson?.data.accounts?.data ,
-          servicefilterData:responseJson?.data?.services?.data
+          accountData: Array.isArray(responseJson?.data.accounts?.data) ? responseJson.data.accounts.data : [],
+          servicefilterData: Array.isArray(responseJson?.data?.services?.data) ? responseJson.data.services.data : []
           
         }));
 
       }
     }
     if (apiRequestCallId === this.getservicedataApiCallID) {
-      this.setState({ servicedatashow: responseJson.data });
+      this.setState({ servicedatashow: Array.isArray(responseJson.data) ? responseJson.data : [] });
     }
   };
   // Customizable Area End

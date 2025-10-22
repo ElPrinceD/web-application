@@ -84,69 +84,43 @@ export default class DocusignIntegration extends DocusignIntegrationController {
             .sideBySideContainer .joinButton {
               display: none !important;
             }
+            
+            /* Hide any buttons inside DocuSign iframe when in side-by-side mode */
+            .sideBySideContainer .docusignPanel iframe {
+              /* Note: We cannot directly style content inside iframes due to CORS */
+              /* The DocuSign iframe content has its own "Join Meeting" button */
+              /* This is part of the DocuSign workflow, not our React component */
+            }
             `}
             </style>
 
 
-            {/* Conditional rendering based on zoomModal state */}
-            {!this.state.zoomModal ? (
-              // Full-width DocuSign with Join Meeting button
-              <>
-                {this.state.sender_url !== "" && (
-                  <iframe
-                    id="docusign-iframe"
-                    className="iframeDocu"
-                    src={this.state.sender_url}
-                  ></iframe>
-                )}
-
-                <Box className="buttonArea">
-                  <Button
-                    variant="contained"
-                    className="joinButton"
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#115293')}
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#012275')}
-                    onClick={() => {
-                      // Ensure DocuSign iframe is protected before showing Zoom
-                      const docusignIframe = document.getElementById("docusign-iframe");
-                      if (docusignIframe) {
-                        docusignIframe.style.zIndex = "2";
-                        docusignIframe.style.position = "relative";
-                        docusignIframe.style.pointerEvents = "auto";
-                      }
-                      this.setState({ zoomModal: true });
-                      this.getZoomMeetingData();
-                    }}
-                  >
-                    <Typography style={{ fontWeight: 500, color: "#fff" }}>
-                      Join Meeting
-                    </Typography>
-                  </Button>
-                </Box>
-              </>
-            ) : (
-              // Side-by-side layout: DocuSign left, Zoom right
-              <Box className="sideBySideContainer">
-                {/* Left: DocuSign Document */}
+            {/* Side-by-side layout container */}
+            <Box className="sideBySideContainer">
+              {/* DocuSign signing experience */}
+              {this.state.sender_url !== "" && (
                 <Box className="docusignPanel">
-                  {this.state.sender_url !== "" && (
-                    <iframe
-                      id="docusign-iframe"
-                      src={this.state.sender_url}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        border: "none",
-                        borderRadius: "12px",
-                        position: "relative",
-                        zIndex: 3,
-                      }}
-                    ></iframe>
+                  {this.state.isLoadingDocuSign && (
+                    <Box className="loadingSpinner">
+                      <Typography variant="body2" style={{ color: "#6b7280" }}>
+                        Loading DocuSign...
+                      </Typography>
+                    </Box>
                   )}
+                  <div id="docusign-container" className="docusignContainer"></div>
                 </Box>
+              )}
 
-                {/* Right: Embedded Zoom */}
+              {/* Zoom meeting panel */}
+              {this.state.zoomModal && (
                 <Box className="zoomPanel">
+                  {this.state.isLoadingZoom && (
+                    <Box className="loadingSpinner">
+                      <Typography variant="body2" style={{ color: "#6b7280" }}>
+                        Loading Zoom meeting...
+                      </Typography>
+                    </Box>
+                  )}
                   {this.state.sdkKey && this.state.signature && this.state.meetingNumber && this.state.password ? (
                     <EmbeddedZoom
                       sdkKey={this.state.sdkKey}
@@ -163,8 +137,32 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                     </Typography>
                   )}
                 </Box>
-              </Box>
-            )}
+              )}
+            </Box>
+
+            {/* React Join Meeting button */}
+            <Box
+              className="buttonArea"
+              style={{
+                display: this.state.zoomModal ? "none" : "flex",
+              }}
+            >
+              <Button
+                variant="contained"
+                className="joinButton"
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#115293')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#012275')}
+                onClick={() => {
+                  this.setState({ zoomModal: true });
+                  this.getZoomMeetingData();
+                }}
+              >
+                <Typography style={{ fontWeight: 500, color: "#fff" }}>
+                  Join Meeting
+                </Typography>
+              </Button>
+            </Box>
+
             </MainContentBox>
             </MainBox>
           </Box>
@@ -180,12 +178,61 @@ const MainBox = styled(Box)({
     justifyContent:"space-between"
   },
 
-  "& .iframeDocu": {
-    width: "70%",
-    height: "600px",
-    overflow: "hidden",
+
+  "& .sideBySideContainer": {
+    display: "flex",
+    gap: "16px",
+    height: "calc(100vh - 120px)",
+    width: "100%",
     marginBottom: "24px",
   },
+
+  "& .docusignPanel": {
+    flex: 3,
+    width: "75%",
+    height: "100%",
+    border: "1px solid #e5e7eb",
+    borderRadius: "12px",
+    backgroundColor: "#ffffff",
+    position: "relative",
+    overflow: "hidden",
+  },
+
+  "& .docusignContainer": {
+    width: "100%",
+    height: "100%",
+    border: "none",
+    borderRadius: "12px",
+  },
+
+  "& .zoomPanel": {
+    flex: 1,
+    width: "25%",
+    height: "100%",
+    border: "1px solid #e5e7eb",
+    borderRadius: "12px",
+    backgroundColor: "#ffffff",
+    position: "relative",
+    overflow: "hidden",
+    resize: "none",
+    minWidth: "300px",
+    maxWidth: "400px",
+  },
+
+  "& .loadingSpinner": {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: "16px",
+    borderRadius: "8px",
+  },
+
 
   "& .buttonArea": {
     display: 'flex',
@@ -201,35 +248,10 @@ const MainBox = styled(Box)({
     color: '#fff',
   },
 
-  "& .sideBySideContainer": {
-    display: 'flex',
-    width: '100%',
-    height: 'calc(100vh - 120px)',
-    gap: '16px',
-    position: 'relative',
-  },
 
-  "& .docusignPanel": {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    position: 'relative',
-    zIndex: 2,
-  },
 
-  "& .zoomPanel": {
-    width: '400px',
-    minWidth: '350px',
-    maxWidth: '500px',
-    height: '100%',
-    position: 'relative',
-    zIndex: 1,
-    overflow: 'hidden',
-    contain: 'layout paint size',
-    isolation: 'isolate',
-  },
+
+
 });
 
 const MainContentBox = styled(Box)({

@@ -73,7 +73,7 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
             toolbar: { buttons: [] },
             // Prevent SDK from injecting global CSS and CORP style that may affect the whole page
             disableCORP: true,
-            isResizable: true,
+            isResizable: false,
           }
         });
 
@@ -89,6 +89,20 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
 
         console.log("🎉 Successfully joined Zoom meeting (embedded)!");
         setIsLoading(false);
+
+        // Add event listeners to handle meeting end
+        clientRef.current.on("meeting-status", (payload: any) => {
+          console.log("📊 Meeting status changed:", payload);
+          if (payload.meetingStatus === "MEETING_STATUS_ENDED" || payload.meetingStatus === "MEETING_STATUS_LEAVING") {
+            console.log("🚪 Meeting ended, re-enabling DocuSign iframe");
+            // Re-enable DocuSign iframe when meeting ends
+            const docusignIframe = document.getElementById("docusign-iframe");
+            if (docusignIframe) {
+              docusignIframe.style.pointerEvents = "auto";
+              console.log("✅ DocuSign iframe re-enabled");
+            }
+          }
+        });
 
         // Ensure Zoom app stays within the local container even if SDK re-parents it
         try {
@@ -186,6 +200,12 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
         mutationObserverRef.current.disconnect();
         mutationObserverRef.current = null;
       }
+      // Re-enable DocuSign iframe when component unmounts
+      const docusignIframe = document.getElementById("docusign-iframe");
+      if (docusignIframe) {
+        docusignIframe.style.pointerEvents = "auto";
+        console.log("🔄 COMPONENT UNMOUNT - DocuSign iframe re-enabled");
+      }
       // Restore any potential global scroll locks from SDK
       unlockGlobalScroll();
     };
@@ -207,6 +227,9 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
   top: 0 !important;
   left: 0 !important;
   z-index: 1 !important;
+  resize: none !important;
+  min-height: 400px !important;
+  overflow: hidden !important;
 }
 html, body {
   overflow: auto !important;
@@ -397,7 +420,16 @@ html, body {
         )}
         <div id="zoom-container" style={{ width: "100%", height: "100%" }}>
           <div id="zoom-meeting-container">
-            <div id="meetingSDKElement" style={{ width: "100%", height: "100%" }}></div>
+            <div 
+          id="meetingSDKElement" 
+          style={{ 
+            width: "100%", 
+            height: "100%",
+            minHeight: "400px",
+            resize: "none",
+            overflow: "hidden"
+          }}
+        ></div>
           </div>
         </div>
       </ZoomContainerWrapper>

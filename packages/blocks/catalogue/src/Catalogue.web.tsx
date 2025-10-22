@@ -62,6 +62,18 @@ export default class Catalogue extends CatalogueController {
     const { selectedJurisdiction, popularNotariesData,searchQuery } = this.state; 
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
+    // Safety check to ensure popularNotariesData is an array
+    if (!Array.isArray(popularNotariesData)) {
+      return (
+        <Box style={{ margin: '32px 24px' }}>
+          <Loader loading={this.state.loader} />
+          {!this.state.loader ? <Typography variant="h6" align="center">
+            No popular notaries available.
+          </Typography> : ""}
+        </Box>
+      );
+    }
+
     const filteredNotaries = popularNotariesData.filter(notary => {
       const matchesJurisdiction = selectedJurisdiction ? notary.jurisdiction === selectedJurisdiction : true;
       const matchesName = notary.name.toLowerCase().includes(normalizedQuery);
@@ -316,14 +328,14 @@ export default class Catalogue extends CatalogueController {
 
     return (
       <>
-        <Box display={"flex"} data-testID="test1">
+        <Box display={"flex"} data-testid="test1">
           <Loader loading={this.state.loader} />
           <RequestModal
             navigation={undefined}
             id={""}
             isOpen={this.state.modalOpen}
             closeModal={this.closeBookNotaryRequestModal}
-            data-testID="modalOpen"
+            data-testid="modalOpen"
             allRequestAPI={() => {}}
             serviceData={this.state.serviceData}
             cancelReqModal={this.state.cancelReqModal}

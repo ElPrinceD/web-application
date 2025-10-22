@@ -98,6 +98,7 @@ export default class NavigationMenuController extends BlockComponent<
 > {
   // Customizable Area Start
   apiGetDataCallId: string = "";
+  private componentMounted: boolean = false;
   // Customizable Area End
 
   constructor(props: Props) {
@@ -152,15 +153,18 @@ export default class NavigationMenuController extends BlockComponent<
 
   // Customizable Area Start
   async componentDidMount() {
-      let role_id = await getStorageData("role_id"); 
-      if (role_id === null || role_id === undefined) {
-        role_id = null;
-      } else {
-        role_id = Number(role_id);
-      }
-  
-      if (role_id === 1 || role_id === null) {
-        this.setState({
+    this.componentMounted = true;
+    let role_id = await getStorageData("role_id"); 
+    if (role_id === null || role_id === undefined) {
+      role_id = null;
+    } else {
+      role_id = Number(role_id);
+    }
+
+    if (!this.componentMounted) return; // Prevent state updates on unmounted component
+
+    if (role_id === 1 || role_id === null) {
+      this.setState({
           services: [
             {
               title: "Dashboard",
@@ -368,6 +372,10 @@ export default class NavigationMenuController extends BlockComponent<
     }else {
       return "false"
     }
+  }
+
+  async componentWillUnmount() {
+    this.componentMounted = false; // Mark component as unmounted
   }
   // Customizable Area End
 }

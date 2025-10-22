@@ -946,7 +946,7 @@ export default class RequestManagement extends RequestManagementController {
     return (
       <div style={{ overflow: "hidden" }}>
         <SuccessFailureModal
-          data-testID={"successFailureModal"}
+          data-testid={"successFailureModal"}
           image={this.state.successFailModalImage}
           isOpen={this.state.isSuccessFailModalOpen}
           text={this.state.successFailModalText}

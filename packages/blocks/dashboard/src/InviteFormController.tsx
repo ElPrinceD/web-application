@@ -877,8 +877,8 @@ export default class InviteFormController extends BlockComponent<Props, S, SS> {
 
   getCountryOptions = () => {
     let codes = this.state.countryCodes.map( code => {
-      return code.country_code.toString();
-    })
+      return code?.country_code?.toString() || "";
+    }).filter(code => code !== ""); // Filter out empty strings
     return codes;
   }
 

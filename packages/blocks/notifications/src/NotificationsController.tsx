@@ -136,6 +136,7 @@ export default class NotificationsController extends BlockComponent<
   // Customizable Area Start
   getNotificationsCallId: string = "";
   markAsReadCallId: string = "";
+  private componentMounted: boolean = false;
   // Customizable Area End
 
   constructor(props: Props) {
@@ -175,6 +176,7 @@ export default class NotificationsController extends BlockComponent<
 
   async componentDidMount() {
     // Customizable Area Start
+    this.componentMounted = true;
     this.getNotifications();
     if (this.state.boxRef.current) {
       this.state.boxRef.current.addEventListener("scroll", this.handleScroll);
@@ -183,6 +185,8 @@ export default class NotificationsController extends BlockComponent<
   }
   async receive(from: string, message: Message) {
     // Customizable Area Start
+    if (!this.componentMounted) return; // Prevent state updates on unmounted component
+    
     if (getName(MessageEnum.RestAPIResponceMessage) === message.id) {
       const callId = message.getData(
         getName(MessageEnum.RestAPIResponceDataMessage)
@@ -273,6 +277,8 @@ export default class NotificationsController extends BlockComponent<
   };
 
   handleMarkAsReadRes = (id?: string | number) => {
+    if (!this.componentMounted) return; // Prevent state updates on unmounted component
+    
     if (id) {
       this.setState(
         (prevState) => ({
@@ -368,6 +374,8 @@ export default class NotificationsController extends BlockComponent<
   }
 
   areAllRead = () => {
+    if (!this.componentMounted) return; // Prevent state updates on unmounted component
+    
     const allRead = this.state.notifications.every(
       (notification) => notification.attributes.is_read
     );
@@ -375,6 +383,8 @@ export default class NotificationsController extends BlockComponent<
   };
 
   filterNotifications = () => {
+    if (!this.componentMounted) return; // Prevent state updates on unmounted component
+    
     const today: INotification[] = [];
     const yesterday: INotification[] = [];
     const twoDaysAgo: INotification[] = [];
@@ -419,6 +429,7 @@ export default class NotificationsController extends BlockComponent<
   };
 
   async componentWillUnmount() {
+    this.componentMounted = false; // Mark component as unmounted
     if (this.state.boxRef.current) {
       this.state.boxRef.current.removeEventListener(
         "scroll",

@@ -72,7 +72,7 @@ export default class NavigationMenu extends NavigationMenuController {
             <Box
               key={index}
               data-test-id="NevigationLinks"
-              data-testID={`navigationBtn${index}`}
+              data-testid={`navigationBtn${index}`}
               className="services"
               onClick={() => this.logOutNvigation(support.title)}
             >

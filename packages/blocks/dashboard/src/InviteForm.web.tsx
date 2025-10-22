@@ -97,7 +97,7 @@ export default class InviteForm extends InviteFormController {
       <Box style={{ position: "relative" }} zIndex={50}>
         {this.state.calendarOpen && (
           <CustomCalendar
-            data-testId="CustomCalendar"
+            data-testid="CustomCalendar"
             currentMonth={this.state.currentMonth}
             selectedDate={this.state.tempSelectedDate}
             selectedSession={this.state.tempSelectedSession}
@@ -196,7 +196,7 @@ export default class InviteForm extends InviteFormController {
       <>
         <ThemeProvider theme={theme}>
           <Modal
-            data-testId="main"
+            data-testid="main"
             disablePortal
             disableEnforceFocus
             disableAutoFocus
@@ -243,7 +243,7 @@ export default class InviteForm extends InviteFormController {
                   <Typography style={styles.heading}>Invite Client</Typography>
                   <IconButton
                     style={{ padding: "10px" }}
-                    data-testId = "closeFormBtn"
+                    data-testid = "closeFormBtn"
                     onClick={this.resetErrorsAtClose}
                   >
                     <Close
@@ -277,7 +277,7 @@ export default class InviteForm extends InviteFormController {
                       }}
                       validateOnChange={false}
                       validateOnBlur={false}
-                      data-testId="formik"                    
+                      data-testid="formik"                    
                     >
                       {({
                         values,
@@ -287,7 +287,7 @@ export default class InviteForm extends InviteFormController {
                         setErrors,
                       }) => (
                         <Form
-                          data-testId="form"
+                          data-testid="form"
                           style={{
                             padding: "12px 8px",
                             display: "flex",
@@ -303,7 +303,7 @@ export default class InviteForm extends InviteFormController {
                             style={{ gap: "4px" }}
                           >
                             <TextField
-                              data-testId="fullName"
+                              data-testid="fullName"
                               fullWidth
                               InputProps={{ style: { color: "#011342" } }}
                               InputLabelProps={{
@@ -342,7 +342,7 @@ export default class InviteForm extends InviteFormController {
                           >
                             <TextField
                               fullWidth
-                              data-testId="email"
+                              data-testid="email"
                               InputProps={{ style: { color: "#011342" } }}
                               InputLabelProps={{
                                 shrink: false,
@@ -382,7 +382,7 @@ export default class InviteForm extends InviteFormController {
                             >
                               <Box width={"100px"}>
                                 <CustomAutocomplete
-                                  data-testId="countryCode"
+                                  data-testid="countryCode"
                                   options={this.getCountryOptions()}
                                   value={values.countryCode}
                                   label={""}
@@ -396,7 +396,7 @@ export default class InviteForm extends InviteFormController {
                               </Box>
                               <TextField
                                 fullWidth
-                                data-testId="mobileNumber"
+                                data-testid="mobileNumber"
                                 InputProps={{ style: { color: "#011342" } }}
                                 InputLabelProps={{
                                   shrink: false,
@@ -445,7 +445,7 @@ export default class InviteForm extends InviteFormController {
                             <Box width={"100%"}>
                               <CustomAutocomplete                            
                                 options={this.getNotaryServicesArray()}
-                                data-testId="serviceType"
+                                data-testid="serviceType"
                                 fontWeight={400}
                                 value={values.serviceType}
                                 label={"Type of notary service"}
@@ -481,7 +481,7 @@ export default class InviteForm extends InviteFormController {
                             <Box width={"100%"}>
                               <CustomAutocomplete
                                 options={this.getNotaryMethodsArray()}
-                                data-testId="notarisationMethod"
+                                data-testid="notarisationMethod"
                                 fontWeight={400}
                                 value={values.notarisationMethod}
                                 label={"Method of Notarisations"}
@@ -535,7 +535,7 @@ export default class InviteForm extends InviteFormController {
                               </Box>
                               <TextField
                                 fullWidth
-                                data-testId="fees"
+                                data-testid="fees"
                                 InputProps={{ style: { color: "#011342" } }}
                                 InputLabelProps={{
                                   shrink: false,
@@ -563,7 +563,7 @@ export default class InviteForm extends InviteFormController {
                           >
                             {values.vatInclusive ? (
                               <IconButton
-                                data-testId="checkedFees"
+                                data-testid="checkedFees"
                                 style={{ padding: 0 }}
                                 onClick={() => this.handleVatInclusiveChange(false, values, setFieldValue)}
                               >
@@ -573,7 +573,7 @@ export default class InviteForm extends InviteFormController {
                               </IconButton>
                             ) : (
                               <IconButton
-                                data-testId="uncheckedFees"
+                                data-testid="uncheckedFees"
                                 style={{ padding: 0 }}
                                 onClick={() => this.handleVatInclusiveChange(true, values, setFieldValue)}
                               >
@@ -598,14 +598,14 @@ export default class InviteForm extends InviteFormController {
                           </Box>
                           <Box width={"100%"}>
                             <TextField
-                              data-testId="date"
+                              data-testid="date"
                               fullWidth
                               InputProps={{
                                 readOnly: true,
                                 endAdornment: (
                                   <InputAdornment position="end">
                                     <IconButton
-                                      data-testId="calendarBtn"
+                                      data-testid="calendarBtn"
                                       edge="end"
                                       onClick={this.calendarOpen}
                                     >
@@ -657,7 +657,7 @@ export default class InviteForm extends InviteFormController {
                             <Box display={"flex"} style={{ gap: "12px" }}>
                               <KeyboardTimePicker
                                 open={this.state.isStartTimePickerOpen}
-                                data-testId={"startTimePicker"}
+                                data-testid={"startTimePicker"}
                                 value={values.startTime}
                                 onClose={() =>
                                   this.setState({ isStartTimePickerOpen: false })
@@ -665,7 +665,7 @@ export default class InviteForm extends InviteFormController {
                                 TextFieldComponent={() => {
                                   return (
                                     <TextField
-                                      data-testId="startTime"
+                                      data-testid="startTime"
                                       fullWidth
                                       InputProps={{
                                         style: { color: "#011342" },
@@ -717,7 +717,7 @@ export default class InviteForm extends InviteFormController {
                               />
                               <KeyboardTimePicker
                                 open={this.state.isEndTimePickerOpen}
-                                data-testId={"endTimePicker"}
+                                data-testid={"endTimePicker"}
                                 value={values.endTime}
                                 onClose={() =>
                                   this.setState({ isEndTimePickerOpen: false })
@@ -725,7 +725,7 @@ export default class InviteForm extends InviteFormController {
                                 TextFieldComponent={() => {
                                   return (
                                     <TextField
-                                      data-testId="endTime"
+                                      data-testid="endTime"
                                       fullWidth
                                       InputProps={{
                                         style: { color: "#011342" },
@@ -791,7 +791,7 @@ export default class InviteForm extends InviteFormController {
                           >
                             {values.videoCall ? (
                               <IconButton
-                                data-testId="checkedVideoCall"
+                                data-testid="checkedVideoCall"
                                 onClick={() => {
                                   setFieldValue("videoCall", false);
                                   setErrors({ ...errors, videoCall: undefined });
@@ -805,7 +805,7 @@ export default class InviteForm extends InviteFormController {
                               </IconButton>
                             ) : (
                               <IconButton
-                                data-testId={"uncheckedVideoCall"}
+                                data-testid={"uncheckedVideoCall"}
                                 style={{ padding: 0 }}
                                 onClick={() => {
                                   setFieldValue("videoCall", true);
@@ -813,7 +813,7 @@ export default class InviteForm extends InviteFormController {
                                 }}
                               >
                                 <CheckBoxOutlineBlankIcon
-                                  data-testId={"videoCallUnchecked"}
+                                  data-testid={"videoCallUnchecked"}
                                  fontSize="medium"
                                   style={{
                                     color: this.findVideoCallCheckboxColor(
@@ -852,7 +852,7 @@ export default class InviteForm extends InviteFormController {
                             >
                               <TextField
                                 className="textField"
-                                data-testId="notes"
+                                data-testid="notes"
                                 fullWidth
                                 multiline
                                 rows={4}
@@ -907,7 +907,7 @@ export default class InviteForm extends InviteFormController {
                                 textTransform: "none",
                                 width: "min(160px, calc(50% - 6px))",
                               }}
-                              data-testId = "closeFormBtn"
+                              data-testid = "closeFormBtn"
                               onClick={this.resetErrorsAtClose}
                             >
                               <Typography style={styles.cancel}>
@@ -916,7 +916,7 @@ export default class InviteForm extends InviteFormController {
                             </Button>
                             <Button
                               variant="contained"
-                              data-testId="submit"
+                              data-testid="submit"
                               type="submit"
                               style={{
                                 color: "#FFF",
