@@ -53,9 +53,10 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
 
         console.log("✅ Zoom containers ready, initializing embedded client...");
 
-        // Calculate initial view size based on the container
+        // Calculate container dimensions
         const containerEl = root.closest('.zoomPanel') as HTMLElement || root.parentElement as HTMLElement || root as HTMLElement;
-        const rect = containerEl.getBoundingClientRect();
+        const containerWidth = containerEl.offsetWidth;
+        const containerHeight = containerEl.offsetHeight;
 
         // Hard constraints to keep Zoom fully sandboxed
         injectScopedZoomCss();
@@ -65,8 +66,8 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
           zoomAppRoot: root,
           language: "en-US",
           viewSize: {
-            width: Math.floor((root as HTMLElement).offsetWidth || rect.width),
-            height: Math.floor((root as HTMLElement).offsetHeight || rect.height),
+            width: containerWidth,
+            height: containerHeight,
           },
           customize: {
             meetingInfo: ["topic", "host", "mn", "pwd", "telPwd", "participant", "dc", "enctype"],
@@ -228,7 +229,6 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
   left: 0 !important;
   z-index: 1 !important;
   resize: none !important;
-  min-height: 400px !important;
   overflow: hidden !important;
 }
 html, body {
@@ -356,6 +356,8 @@ html, body {
   };
 
   const setupResizeHandling = (containerEl: HTMLElement) => {
+    // Disabled ResizeObserver to prevent resizing
+    /*
     try {
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
@@ -382,6 +384,7 @@ html, body {
       const onResize = () => safeDispatchResize();
       window.addEventListener("resize", onResize);
     }
+    */
   };
 
   return (
@@ -423,11 +426,13 @@ html, body {
             <div 
           id="meetingSDKElement" 
           style={{ 
-            width: "100%", 
+            width: "100%",
             height: "100%",
-            minHeight: "400px",
+            minWidth: "100%",
+            minHeight: "100%",
             resize: "none",
-            overflow: "hidden"
+            overflow: "hidden",
+            pointerEvents: "auto"
           }}
         ></div>
           </div>

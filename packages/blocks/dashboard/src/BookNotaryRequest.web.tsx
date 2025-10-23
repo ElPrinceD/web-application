@@ -447,14 +447,16 @@ export default class BookNotaryRequestWeb extends BookNotaryRequestController {
           <Button
             data-testID="createBtn"
             onClick={this.handleNext}
+            disabled={this.state.isCreatingRequest}
             style={{
               width: "160px",
               height: "44px",
               color: "white",
-              backgroundColor: "#012275",
+              backgroundColor: this.state.isCreatingRequest ? "#ccc" : "#012275",
+              cursor: this.state.isCreatingRequest ? "not-allowed" : "pointer",
             }}
           >
-            {this.findNextButtonText()}
+            {this.state.isCreatingRequest ? "Creating..." : this.findNextButtonText()}
           </Button>
         </Box>
       </>

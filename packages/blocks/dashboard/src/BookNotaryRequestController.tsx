@@ -299,6 +299,7 @@ interface S {
   isCity:boolean;
   isPostCode:boolean;
   isDrafted:boolean;
+  isCreatingRequest:boolean;
   clientFullName:string;
   clientEmail:string;
   clientPhoneNumber:number | string;
@@ -397,6 +398,7 @@ export default class BookNotaryRequestController extends BlockComponent<
       isCity: false,
       isPostCode: false,
       isDrafted: false,
+      isCreatingRequest: false,
       clientFullName:"",
       clientEmail:"",
       clientPhoneNumber:"",
@@ -434,12 +436,48 @@ export default class BookNotaryRequestController extends BlockComponent<
         getName(MessageEnum.RestAPIResponceSuccessMessage)
       );
 
+      let errorRes = message.getData(
+        getName(MessageEnum.RestAPIResponceErrorMessage)
+      );
+
+      console.log(`🔍 BookNotaryRequest API Response for callId ${callId}:`, {
+        success: !!res,
+        error: !!errorRes,
+        response: res,
+        errorResponse: errorRes
+      });
+
       if (this.isValidResponse(res)) {
+        console.log(`✅ BookNotaryRequest API Success for callId ${callId}`);
         switch (callId) {
           case this.validateGuestEmailCallId:
               this.handleResponse(res);
               break;
           case this.createRequestCallId:
+            console.log("🎉 Request created successfully:", res);
+            this.setState({ isCreatingRequest: false });
+            this.props.setLoader(false);
+            this.props.setModal(false);
+            this.setState(
+              {
+                onStep: 1,
+                selectedMethod: "",
+                selectedDate: null,
+                selectedJuridiction: "",
+                selectedService: "",
+                totalDocuments: 0,
+                additionalDetails: "",
+                files: [],
+                selectedSession: "",
+                checkboxOne: false,
+                checkboxTwo: false,
+                saveModal: true,
+              },
+              () => {
+                this.props.allRequestAPI && this.props.allRequestAPI();
+              }
+            );
+            break;
           case this.acceptRequestCallId:
           case this.postGuestRequestApiCallId:
             this.props.setLoader(false);
@@ -481,6 +519,25 @@ export default class BookNotaryRequestController extends BlockComponent<
             this.handleProfileResponse(res);
             break;
             
+        }
+      } else {
+        console.error(`❌ BookNotaryRequest API Error for callId ${callId}:`, {
+          response: res,
+          errorResponse: errorRes,
+          errors: res?.errors,
+          error: res?.error
+        });
+
+        // Handle specific API errors
+        if (callId === this.createRequestCallId) {
+          console.error("🚨 REQUEST CREATION FAILED!");
+          this.setState({ isCreatingRequest: false });
+          this.props.setLoader(false);
+          this.setState({
+            saveModal: false,
+            failureModal: true,
+            failureModalText: res?.errors || res?.error || "Failed to create request. Please try again."
+          });
         }
       }
     }
@@ -612,19 +669,64 @@ export default class BookNotaryRequestController extends BlockComponent<
     }
   };
 
+  validateToken = async () => {
+    const token = await getStorageData("token");
+    if (!token) {
+      console.error("❌ No authentication token found");
+      return false;
+    }
+    
+    // Check if token is expired (basic JWT decode)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) {
+        console.error("❌ Authentication token has expired");
+        return false;
+      }
+      console.log("✅ Token is valid, expires at:", new Date(payload.exp * 1000));
+      return true;
+    } catch (error) {
+      console.error("❌ Invalid token format:", error);
+      return false;
+    }
+  };
+
   apiCall = async (apiData: ApiCallInterface) => {
     let token = await getStorageData("token");
     const { contentType, method, endPoint, body } = apiData;
 
-    if (this.tokenRequiredForApi(endPoint) && !token) {
-      this.setState({loader:false})    
-      return null;
+    console.log(`🚀 BookNotaryRequest API Call:`, {
+      endpoint: endPoint,
+      method: method,
+      hasToken: !!token,
+      tokenLength: token?.length || 0,
+      body: body ? JSON.stringify(body).substring(0, 200) + '...' : 'No body'
+    });
+
+    if (this.tokenRequiredForApi(endPoint)) {
+      if (!token) {
+        console.error("❌ BookNotaryRequest API Call Failed: No token available for protected endpoint");
+        this.setState({loader:false})    
+        return null;
+      }
+      
+      // Validate token before making the call
+      const isValidToken = await this.validateToken();
+      if (!isValidToken) {
+        console.error("❌ BookNotaryRequest API Call Failed: Invalid or expired token");
+        this.setState({loader:false})    
+        return null;
+      }
     }
 
     const header = {
       "Content-Type": contentType,
       token: token,
     };
+
+    console.log(`📤 BookNotaryRequest API Request Headers:`, header);
+
     const requestMessage = new Message(
       getName(MessageEnum.RestAPIRequestMessage)
     );
@@ -645,6 +747,8 @@ export default class BookNotaryRequestController extends BlockComponent<
       getName(MessageEnum.RestAPIRequestMethodMessage),
       method
     );
+    
+    console.log(`📨 BookNotaryRequest Sending message with ID: ${requestMessage.messageId}`);
     runEngine.sendMessage(requestMessage.id, requestMessage);
     return requestMessage.messageId;
   };
@@ -700,10 +804,23 @@ export default class BookNotaryRequestController extends BlockComponent<
 
   transformData = (data: Array<Document>) => {
     return data.map((item: Document) => {
+      // Ensure we have the full data URL format like the working curl request
+      let docFile = item.base64;
+      if (!docFile.includes("data:")) {
+        // If it's just base64, add the data URL prefix
+        const mimeType = item?.document?.type || "image/jpeg"; // Default to jpeg if no type
+        docFile = `data:${mimeType};base64,${docFile}`;
+      }
+      
+      console.log("📁 TRANSFORMING FILE DATA:", {
+        originalBase64: item.base64.substring(0, 50) + "...",
+        finalDocFile: docFile.substring(0, 50) + "...",
+        fileName: item?.document?.name,
+        recipientsCount: item.recipients_attributes.length
+      });
+
       return {
-        base64: item.base64.includes(",")
-          ? item.base64.split(",")[1]
-          : item.base64,
+        doc_file: docFile,  // Use 'doc_file' instead of 'base64' to match API
         file: item?.document?.name,
         recipients_attributes: item.recipients_attributes.map(
           (recipient) => ({
@@ -757,7 +874,29 @@ export default class BookNotaryRequestController extends BlockComponent<
 
   createRequest = async (isDraft:boolean = false) => {
     const { isNewRequestOrEditRequestOrInviteClient } = this.props;
+    
+    // Prevent double-click by checking if request is already being created
+    if (this.state.isCreatingRequest) {
+      console.log("⚠️ Request creation already in progress, ignoring duplicate click");
+      return;
+    }
+    
+    console.log("🎯 CREATE REQUEST DEBUG:", {
+      isNewRequestOrEditRequestOrInviteClient,
+      isDraft,
+      selectedService: this.state.selectedService,
+      selectedMethod: this.state.selectedMethod,
+      selectedJuridiction: this.state.selectedJuridiction,
+      selectedDate: this.state.selectedDate,
+      totalDocuments: this.state.totalDocuments,
+      selectedSession: this.state.selectedSession,
+      priorityName: this.state.priorityName,
+      filesCount: this.state.files.length
+    });
+
     if( isNewRequestOrEditRequestOrInviteClient !== "invite" && isNewRequestOrEditRequestOrInviteClient !== "guest" ) {
+      // Set creating state to prevent double-clicks
+      this.setState({ isCreatingRequest: true });
       this.props.setLoader(true);
       const transformedData = this.transformData(this.state.files);
       let requestData = {
@@ -773,6 +912,20 @@ export default class BookNotaryRequestController extends BlockComponent<
           file_documents_attributes: transformedData,
         },
       };
+
+      console.log("📋 REQUEST DATA TO SEND:", JSON.stringify(requestData, null, 2));
+      console.log("🔗 ENDPOINT:", this.createRequestEndPoint(isDraft));
+      console.log("📝 METHOD:", this.props.isNewRequestOrEditRequestOrInviteClient === "new" ? configJSON.postMethod : configJSON.putMethod);
+      
+      // Log the exact structure to compare with working curl
+      console.log("🔍 COMPARING WITH WORKING CURL FORMAT:");
+      console.log("Frontend file_documents_attributes:", requestData.notary_request.file_documents_attributes);
+      console.log("Expected format (from curl):", {
+        "doc_file": "data:image/jpeg;base64,/9j/4AAQ...",
+        "file": "1.jpg",
+        "recipients_attributes": [{"name": "Black Stars", "email": "elprince.elp@gmail.com", "is_signatory": true}]
+      });
+
       this.setState({ tempSelectedDate: null, tempSelectedSession: "" });
       this.createRequestCallId = await this.apiCall({
         contentType: configJSON.appJsonContentType,
@@ -783,6 +936,8 @@ export default class BookNotaryRequestController extends BlockComponent<
         endPoint: this.createRequestEndPoint(isDraft),
         body: requestData,
       });
+
+      console.log("🆔 CREATE REQUEST CALL ID:", this.createRequestCallId);
     }else if (isNewRequestOrEditRequestOrInviteClient === "invite"){
       this.props.setLoader(false);
       this.createInviteRequest();

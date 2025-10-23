@@ -1146,6 +1146,13 @@ export default class BlockController extends BlockComponent<Props, S, SS> {
       "Content-Type": configJSON.getNotaryRequestDetailsApiContentType,
       token: token,
     };
+    const endpoint = configJSON.getNotaryRequestDetailsApiEndPoint + this.state.notaryRequestId;
+    console.log("🔍 CALLING API ENDPOINT:", endpoint);
+    console.log("🔍 REQUEST HEADERS:", header);
+    console.log("🔍 REQUEST ID:", this.state.notaryRequestId);
+    console.log("🔍 CONFIG ENDPOINT:", configJSON.getNotaryRequestDetailsApiEndPoint);
+    console.log("🔍 CONFIG METHOD:", configJSON.getNotaryRequestDetailsApiMethodType);
+    
     const requestMessage = new Message(
       getName(MessageEnum.RestAPIRequestMessage)
     );
@@ -1156,7 +1163,7 @@ export default class BlockController extends BlockComponent<Props, S, SS> {
     );
     requestMessage.addData(
       getName(MessageEnum.RestAPIResponceEndPointMessage),
-      configJSON.getNotaryRequestDetailsApiEndPoint + this.state.notaryRequestId
+      endpoint
     );
     requestMessage.addData(
       getName(MessageEnum.RestAPIRequestMethodMessage),
@@ -1741,6 +1748,9 @@ if(path){
         this.deleteNotaryRequest(responseJson);
         break;
       case this.getNotaryRequestDetailsCallId:
+        console.log("🔍 API RESPONSE RECEIVED:", responseJson);
+        console.log("🔍 RESPONSE TYPE:", typeof responseJson);
+        console.log("🔍 RESPONSE KEYS:", Object.keys(responseJson));
         this.handleResOfNotaryReqDetails(responseJson);
         break;
       case this.getCancellationChargesApiCallId:
@@ -1773,13 +1783,19 @@ if(path){
         }
         break;
       case this.getQuotesListApiCallId:
-        const quotes = responseJson.data;
-        quotes.sort(
-          (a: IQuote, b: IQuote) =>
-            new Date(b.attributes.created_at).getTime() -
-            new Date(a.attributes.created_at).getTime()
-        );
-        this.setState({ quotes: quotes, loader: false });
+        console.log("📋 Quotes API Response:", responseJson);
+        if (responseJson.data && Array.isArray(responseJson.data)) {
+          const quotes = responseJson.data;
+          quotes.sort(
+            (a: IQuote, b: IQuote) =>
+              new Date(b.attributes.created_at).getTime() -
+              new Date(a.attributes.created_at).getTime()
+          );
+          this.setState({ quotes: quotes, loader: false });
+        } else {
+          console.warn("⚠️ No quotes data received or invalid format:", responseJson);
+          this.setState({ quotes: [], loader: false });
+        }
         break;
       case this.acceptQuoteApiCallId:
         if (responseJson.message === "Quote accepted successfully.")
@@ -1817,6 +1833,8 @@ if(path){
     apiRequestCallId: string,
     responseJson: ISubmitQuoteFailureResponse & ICancellationChargeFailure
   ) => {
+    console.error(`❌ API Error for callId ${apiRequestCallId}:`, responseJson);
+    
     if (apiRequestCallId === this.submitQuoteApiCallId) {
       this.setState({
         successFailModalImage: failureImage,
@@ -1835,6 +1853,13 @@ if(path){
     if (apiRequestCallId === this.getMeetingTimeApiCallId) {
       this.setState({ loader: false })
     }
+    if (apiRequestCallId === this.getQuotesListApiCallId) {
+      console.warn("⚠️ Quotes API failed - setting empty quotes array");
+      this.setState({ 
+        quotes: [], 
+        loader: false 
+      });
+    }
   };
 
   downloadInvoiceHandle = (responseJson:InvoiceDownload) => {
@@ -1849,10 +1874,32 @@ if(path){
   }
 
   handleResOfNotaryReqDetails = (responseJson: NotaryRequestDetails) => {
+    console.log("🔍 FULL API RESPONSE:", JSON.stringify(responseJson, null, 2));
+    
     const docs = responseJson.data.attributes.file_documents.length > 0 ? responseJson.data.attributes.file_documents : [];
+    console.log("📄 DOCUMENTS DATA:", docs);
+    console.log("📄 DOCUMENTS COUNT:", docs.length);
+    
+    // Check if signatory_count exists in each document
+    docs.forEach((doc, index) => {
+      console.log(`📄 Document ${index}:`, {
+        doc_id: doc.doc_id,
+        doc_name: doc.doc_name,
+        signatory_count: doc.signatory_count,
+        recipients: doc.recipients,
+        has_signatory_count: 'signatory_count' in doc,
+        has_recipients: 'recipients' in doc
+      });
+    });
+    
     const totalSignatoryCount = docs.reduce((total, doc) => {
-      return total + doc.signatory_count;
+      const signatoryCount = doc.signatory_count || 0;
+      console.log(`📄 Document ${doc.doc_name}: signatory_count = ${signatoryCount}`);
+      return total + signatoryCount;
     }, 0);
+    
+    console.log("📊 TOTAL SIGNATORY COUNT:", totalSignatoryCount);
+    
     this.setState(
       {
         notaryRequestId: responseJson.data.id,

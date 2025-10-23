@@ -153,7 +153,7 @@ export default class DocusignIntegrationController extends BlockComponent<
             });
             break;
           case this.getServicesApiCallId:
-            this.setState({ serviceData: responseJson.data });
+            this.setState({ serviceData: responseJson.data, loader: false });
             break;
           case this.zoomMeetingApiCallId:
             console.log('Zoom meeting data received:', responseJson.zoom_meetings);
@@ -168,6 +168,16 @@ export default class DocusignIntegrationController extends BlockComponent<
         }
       } else {
         // Handle API errors
+        console.error(`❌ API Error for callId ${apiRequestCallId}:`, responseJson);
+        
+        if (apiRequestCallId === this.getProfileApiCallId) {
+          console.error('Failed to fetch profile data');
+          this.setState({ loader: false }); // Clear loader on profile error
+        }
+        if (apiRequestCallId === this.getServicesApiCallId) {
+          console.error('Failed to fetch services data');
+          this.setState({ loader: false }); // Clear loader on services error
+        }
         if (apiRequestCallId === this.zoomMeetingApiCallId) {
           console.error('Failed to fetch Zoom meeting data');
           this.setState({ isLoadingZoom: false }); // Clear loading state on error
@@ -187,7 +197,16 @@ export default class DocusignIntegrationController extends BlockComponent<
         this.initializeDocuSignSDK();
       });
     }
+
+    // Set a timeout to clear loader if API calls take too long
+    setTimeout(() => {
+      if (this.state.loader) {
+        console.warn('⚠️ Loader timeout - clearing loader after 10 seconds');
+        this.setState({ loader: false });
+      }
+    }, 10000); // 10 second timeout
   }
+
 
   componentDidUpdate(prevProps: Props, prevState: S) {
     // Handle any state changes if needed
