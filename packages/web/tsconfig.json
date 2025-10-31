@@ -20,7 +20,8 @@
     "src",
     "../components/src",
     "../framework/src/types.d.ts",
-    "./src/types/global.d.ts"
+    "./src/types/global.d.ts",
+    "./src/types/minimatch.d.ts"
   ],
   "references": [
     {

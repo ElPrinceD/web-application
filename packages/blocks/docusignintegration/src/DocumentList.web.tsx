@@ -61,19 +61,21 @@ export default class DocumentList extends DocumentListController {
                 The status of documents sent for sign
               </Typography>
             </Box>
-            {this.state.documentDetails.map(
-              (document, documentIndex) =>
-                this.isThisDocumentShown(document.is_docusign_start) && (
-                  <Box
-                    p={"12px"}
-                    display={"flex"}
-                    flexDirection={"column"}
-                    style={{
-                      borderRadius: "16px",
-                      gap: "12px",
-                      backgroundColor: "#F5F9FF",
-                    }}
-                  >
+            {this.state.documentDetails && Array.isArray(this.state.documentDetails) && this.state.documentDetails.length > 0 ? (
+              this.state.documentDetails.map(
+                (document, documentIndex) =>
+                  this.isThisDocumentShown(document.is_docusign_start) && (
+                    <Box
+                      key={`document-${document.document_id || documentIndex}`}
+                      p={"12px"}
+                      display={"flex"}
+                      flexDirection={"column"}
+                      style={{
+                        borderRadius: "16px",
+                        gap: "12px",
+                        backgroundColor: "#F5F9FF",
+                      }}
+                    >
                     <Box
                       display={"flex"}
                       alignItems={"center"}
@@ -189,35 +191,42 @@ export default class DocumentList extends DocumentListController {
                         flexDirection={"column"}
                         style={{ gap: "12px" }}
                       >
-                        {document.signatory.map(
-                          (signatory) =>
-                            signatory.is_signatory && (
-                              <Box
-                                display={"flex"}
-                                justifyContent={"space-between"}
-                              >
-                                <Box display={"flex"} style={{ gap: "8px" }}>
-                                  
-                                  <Box>
-                                    <Typography style={webStyle.signatoryName}>
-                                      {signatory.name}
-                                    </Typography>
-                                    <Typography style={webStyle.signatoryEmail}>
-                                      {signatory.email}
-                                    </Typography>
+                        {document.signatory && Array.isArray(document.signatory) ? (
+                          document.signatory.map(
+                            (signatory, signatoryIndex) =>
+                              signatory.is_signatory && (
+                                <Box
+                                  key={`signatory-${signatoryIndex}`}
+                                  display={"flex"}
+                                  justifyContent={"space-between"}
+                                >
+                                  <Box display={"flex"} style={{ gap: "8px" }}>
+                                    
+                                    <Box>
+                                      <Typography style={webStyle.signatoryName}>
+                                        {signatory.name}
+                                      </Typography>
+                                      <Typography style={webStyle.signatoryEmail}>
+                                        {signatory.email}
+                                      </Typography>
+                                    </Box>
                                   </Box>
+                                  <SignStatusBox>
+                                    <Typography
+                                      className={`${this.isSignedOrPending(
+                                        signatory.signed
+                                      )} statusBox`}
+                                    >
+                                      {this.isSignedOrPending(signatory.signed)}
+                                    </Typography>
+                                  </SignStatusBox>
                                 </Box>
-                                <SignStatusBox>
-                                  <Typography
-                                    className={`${this.isSignedOrPending(
-                                      signatory.signed
-                                    )} statusBox`}
-                                  >
-                                    {this.isSignedOrPending(signatory.signed)}
-                                  </Typography>
-                                </SignStatusBox>
-                              </Box>
-                            )
+                              )
+                          )
+                        ) : (
+                          <Typography variant="body2" style={{ color: "#6b7280" }}>
+                            No signatories found
+                          </Typography>
                         )}
                       </Box>
                     </Box>
@@ -236,26 +245,35 @@ export default class DocumentList extends DocumentListController {
                         <Box display={"flex"} style={{ gap: "8px" }}>
                           <Box>
                             <Typography style={webStyle.signatoryName}>
-                              {document.notary[0].name}
+                              {document.notary && document.notary[0] ? document.notary[0].name : "Notary"}
                             </Typography>
                             <Typography style={webStyle.signatoryEmail}>
-                              {document.notary[0].email}
+                              {document.notary && document.notary[0] ? document.notary[0].email : "N/A"}
                             </Typography>
                           </Box>
                         </Box>
                         <SignStatusBox>
                           <Typography
                             className={`${
-                              document.notary[0].signed ? "signed" : "pending"
+                              document.notary && document.notary[0] && document.notary[0].signed ? "signed" : "pending"
                             } statusBox`}
                           >
-                            {document.notary[0].signed ? "SIGNED" : "PENDING"}
+                            {document.notary && document.notary[0] && document.notary[0].signed ? "SIGNED" : "PENDING"}
                           </Typography>
                         </SignStatusBox>
                       </Box>
                     </Box>
                   </Box>
                 )
+              )
+            ) : (
+              <Box p={3} style={{ textAlign: "center", backgroundColor: "#F5F9FF", borderRadius: "16px" }}>
+                <Typography variant="body2" style={{ color: "#6b7280" }}>
+                  {this.state.loader 
+                    ? "Loading document status..." 
+                    : "No documents found. Documents will appear here once DocuSign signing is started."}
+                </Typography>
+              </Box>
             )}
           </Box>
         )}

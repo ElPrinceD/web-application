@@ -22,7 +22,7 @@ exports.getDocusignApiEndpoint = "bx_block_menu_ordering/docusign_status?notary_
 
 exports.startDocuSignApiContentType = "application/json";
 exports.startDocuSignApiMethodType = "POST";
-exports.startDocuSignApiEndpoint = "bx_block_menu_ordering/docusign_start";
+exports.startDocuSignApiEndpoint = "bx_block_menu_ordering/notary_requests/docusign_start";
 
 exports.generateSigningUrlsApiContentType = "application/json";
 exports.generateSigningUrlsApiMethodType = "POST";

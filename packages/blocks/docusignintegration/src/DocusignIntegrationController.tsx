@@ -6,14 +6,9 @@ import MessageEnum, {
   getName,
 } from "../../../framework/src/Messages/MessageEnum";
 import { runEngine } from "../../../framework/src/RunEngine";
-import { getStorageData } from "../../../framework/src/Utilities";
+import { getStorageData, removeStorageData } from "../../../framework/src/Utilities";
 
-// DocuSign JS SDK TypeScript declarations
-declare global {
-  interface Window {
-    DocuSign: any;
-  }
-}
+// DocuSign integration - using direct iframe embedding (no SDK needed)
 
 export const configJSON = require("./config");
 
@@ -66,10 +61,15 @@ interface S {
   signature: string;
   meetingNumber: string;
   password: string;
-  // DocuSign JS SDK state
+  // DocuSign state
   isLoadingDocuSign: boolean;
   isLoadingZoom: boolean;
-  docusignInitialized: boolean;
+  signingUrlsArray: Array<{
+    recipient_id: number;
+    email: string;
+    name: string;
+    signing_url: string;
+  }>;
 }
 
 interface SS {
@@ -115,10 +115,10 @@ export default class DocusignIntegrationController extends BlockComponent<
       signature: "",
       meetingNumber: "",
       password: "",
-      // DocuSign JS SDK state
+      // DocuSign state
       isLoadingDocuSign: false,
       isLoadingZoom: false,
-      docusignInitialized: false,
+      signingUrlsArray: [],
     };
 
     runEngine.attachBuildingBlock(this as IBlock, this.subScribedMessages);
@@ -190,12 +190,56 @@ export default class DocusignIntegrationController extends BlockComponent<
     this.setState({ notaryRequestId: await getStorageData("notaryRequestId") });
     this.getProfile();
     this.getServicesAPI();
-    const url = await getStorageData("doc_sign_url")
+    
+    // Check for multiple signers first (new format)
+    const signingUrlsArrayStr = await getStorageData("docusign_signing_urls_array");
+    if (signingUrlsArrayStr) {
+      try {
+        const signingUrlsArray = JSON.parse(signingUrlsArrayStr);
+        if (Array.isArray(signingUrlsArray) && signingUrlsArray.length > 0) {
+          // Validate all signing URLs
+          const validSigningUrls = signingUrlsArray.filter(signer => 
+            this.isValidSigningUrl(signer.signing_url)
+          );
+          
+          if (validSigningUrls.length > 0) {
+            console.log(`✅ Found ${validSigningUrls.length} valid signing URL(s)`);
+            this.setState({ 
+              signingUrlsArray: validSigningUrls,
+              sender_url: validSigningUrls[0].signing_url,
+              isLoadingDocuSign: false
+            });
+            return;
+          } else {
+            console.error("❌ No valid signing URLs found in signing_urls_array");
+            // Clear invalid data
+            removeStorageData("docusign_signing_urls_array");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to parse signing_urls_array:", error);
+      }
+    }
+    
+    // Fallback to single URL (backward compatibility)
+    const url = await getStorageData("doc_sign_url");
     if (url) {
-      this.setState({ sender_url: url }, () => {
-        // Initialize DocuSign JS SDK after URL is set
-        this.initializeDocuSignSDK();
-      });
+      if (this.isValidSigningUrl(url)) {
+        console.log("✅ Valid signing URL found:", url);
+        this.setState({ 
+          sender_url: url,
+          isLoadingDocuSign: false
+        });
+      } else {
+        console.error("❌ Invalid signing URL stored in doc_sign_url:", url);
+        console.error("Please call the DocuSign API again to get a fresh signing URL");
+        // Clear invalid URL
+        removeStorageData("doc_sign_url");
+        this.setState({ 
+          sender_url: "",
+          isLoadingDocuSign: false
+        });
+      }
     }
 
     // Set a timeout to clear loader if API calls take too long
@@ -307,137 +351,46 @@ export default class DocusignIntegrationController extends BlockComponent<
     }
   };
 
-  // Initialize DocuSign JS SDK
-  initializeDocuSignSDK = async () => {
-    if (!this.state.sender_url) {
-      console.error("No DocuSign URL available");
-      return;
-    }
-
-    this.setState({ isLoadingDocuSign: true });
-
-    try {
-      // Load DocuSign JS SDK dynamically
-      await this.loadDocuSignSDK();
-      
-      // Initialize DocuSign with Focused View
-      await this.initializeDocuSignFocusedView();
-      
-      this.setState({ 
-        isLoadingDocuSign: false, 
-        docusignInitialized: true 
-      });
-      
-      console.log("✅ DocuSign JS SDK initialized successfully");
-    } catch (error) {
-      console.error("❌ Failed to initialize DocuSign JS SDK:", error);
-      this.setState({ isLoadingDocuSign: false });
-      
-      // Fallback to popup window
-      this.initializeDocuSignPopup();
-    }
-  };
-
-  // Load DocuSign JS SDK from CDN
-  loadDocuSignSDK = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      // Check if DocuSign SDK is already loaded
-      if (window.DocuSign) {
-        resolve();
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = 'https://demo.docusign.net/restapi/sdk/docusign-js/v1/docusign-js.js';
-      script.async = true;
-      script.onload = () => {
-        console.log("✅ DocuSign JS SDK loaded");
-        resolve();
-      };
-      script.onerror = () => {
-        console.error("❌ Failed to load DocuSign JS SDK");
-        reject(new Error("Failed to load DocuSign JS SDK"));
-      };
-      
-      document.head.appendChild(script);
-    });
-  };
-
-  // Initialize DocuSign with Focused View
-  initializeDocuSignFocusedView = async () => {
-    const container = document.getElementById('docusign-container');
-    if (!container) {
-      throw new Error("DocuSign container not found");
-    }
-
-    // Clear container
-    container.innerHTML = '';
-
-    try {
-      // Use DocuSign JS SDK to render signing experience
-      const docusign = new window.DocuSign({
-        environment: 'demo', // or 'production' for live
-        accountId: this.extractAccountIdFromUrl(this.state.sender_url),
-      });
-
-      // Initialize the signing session
-      await docusign.open({
-        url: this.state.sender_url,
-        container: container,
-        width: '100%',
-        height: '100%',
-        showHeader: false,
-        showNavigation: true,
-        showFinishButton: true,
-        onSigningComplete: (data: any) => {
-          console.log("✅ DocuSign signing completed:", data);
-          this.handleDocuSignComplete(data);
-        },
-        onError: (error: any) => {
-          console.error("❌ DocuSign error:", error);
-          this.handleDocuSignError(error);
-        }
-      });
-
-    } catch (error) {
-      console.error("❌ DocuSign initialization error:", error);
-      throw error;
-    }
-  };
-
-  // Fallback: Initialize DocuSign with popup window
-  initializeDocuSignPopup = () => {
-    const container = document.getElementById('docusign-container');
-    if (!container) {
-      console.error("DocuSign container not found");
-      return;
-    }
-
-    // Create popup-style iframe as fallback
-    const iframe = document.createElement('iframe');
-    iframe.src = this.state.sender_url;
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    iframe.style.borderRadius = '12px';
-    
-    container.appendChild(iframe);
-    
-    console.log("✅ DocuSign popup fallback initialized");
-  };
-
-  // Extract account ID from DocuSign URL
-  extractAccountIdFromUrl = (url: string): string => {
-    // This is a placeholder - you'll need to implement based on your URL structure
-    const match = url.match(/accountId=([^&]+)/);
-    return match ? match[1] : '';
-  };
-
-  // Handle DocuSign signing completion
+  // Handle DocuSign signing completion (called when iframe completes signing)
   handleDocuSignComplete = (data: any) => {
     console.log("🎉 DocuSign signing completed successfully");
     // Handle completion logic here
     // You might want to show a success message or redirect
+  };
+
+  // Validate DocuSign signing URL
+  isValidSigningUrl = (url: string | null | undefined): boolean => {
+    if (!url || typeof url !== 'string') {
+      return false;
+    }
+    
+    // Valid signing URLs should match these patterns:
+    // - https://demo.docusign.net/Signing/...
+    // - https://demo.docusign.net/Member/PowerFormSigning.aspx?...
+    // - https://demo.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=...
+    // - https://na1.docusign.net/Signing/... (production)
+    // - https://account-d.docusign.com/ is NOT a valid signing URL (account dashboard)
+    
+    const validSigningUrlPatterns = [
+      /^https:\/\/demo\.docusign\.net\/(Signing|Member)/i,
+      /^https:\/\/(na1|na2|na3|eu1|eu2|au1)\.docusign\.net\/(Signing|Member)/i,
+    ];
+    
+    // Check if URL matches any valid pattern
+    const isValid = validSigningUrlPatterns.some(pattern => pattern.test(url));
+    
+    // Explicitly reject account dashboard URLs
+    if (url.includes('account-d.docusign.com') || url.includes('account.docusign.com')) {
+      console.error("❌ Invalid DocuSign URL detected (account dashboard URL):", url);
+      return false;
+    }
+    
+    if (!isValid) {
+      console.error("❌ Invalid DocuSign signing URL format:", url);
+      console.error("Expected format: https://demo.docusign.net/Signing/... or https://demo.docusign.net/Member/PowerFormSigning.aspx?...");
+    }
+    
+    return isValid;
   };
 
   // Handle DocuSign errors

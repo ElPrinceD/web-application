@@ -34,7 +34,7 @@
   "scripts": {
     "compile": "tsc -b",
     "prestart": "echo 'Skipping TypeScript compilation for development'",
-    "start": "HTTPS=true npm run _start",
+    "start": "npm run _start",
     "windows_start": "concurrently \"npm run compile -- -w --incremental\" \"npm run _start\"",
     "_start": "react-app-rewired start",
     "prebuild": "npm run compile",

@@ -9,6 +9,7 @@ import { Message } from "../../../framework/src/Message";
 import {
   getStorageData,
   setStorageData,
+  removeStorageData,
 } from "../../../framework/src/Utilities";
 
 export const configJSON = require("./config");
@@ -101,7 +102,41 @@ export default class DocumentListController extends BlockComponent<
   }
 
   isValidResponse = (responseJson: ValidResponseType) =>
-    responseJson && !responseJson.errors;
+    responseJson && !responseJson.errors && responseJson.status !== 404;
+
+  // Validate DocuSign signing URL
+  isValidSigningUrl = (url: string | null | undefined): boolean => {
+    if (!url || typeof url !== 'string') {
+      return false;
+    }
+    
+    // Valid signing URLs should match these patterns:
+    // - https://demo.docusign.net/Signing/...
+    // - https://demo.docusign.net/Member/PowerFormSigning.aspx?...
+    // - https://na1.docusign.net/Signing/... (production)
+    // - https://account-d.docusign.com/ is NOT a valid signing URL (account dashboard)
+    
+    const validSigningUrlPatterns = [
+      /^https:\/\/demo\.docusign\.net\/(Signing|Member)/i,
+      /^https:\/\/(na1|na2|na3|eu1|eu2|au1)\.docusign\.net\/(Signing|Member)/i,
+    ];
+    
+    // Check if URL matches any valid pattern
+    const isValid = validSigningUrlPatterns.some(pattern => pattern.test(url));
+    
+    // Explicitly reject account dashboard URLs
+    if (url.includes('account-d.docusign.com') || url.includes('account.docusign.com')) {
+      console.error("❌ Invalid DocuSign URL detected (account dashboard URL):", url);
+      return false;
+    }
+    
+    if (!isValid) {
+      console.error("❌ Invalid DocuSign signing URL format:", url);
+      console.error("Expected format: https://demo.docusign.net/Signing/... or https://demo.docusign.net/Member/PowerFormSigning.aspx?...");
+    }
+    
+    return isValid;
+  };
 
   async receive(from: string, message: Message) {
     if (getName(MessageEnum.RestAPIResponceMessage) === message.id) {
@@ -113,18 +148,77 @@ export default class DocumentListController extends BlockComponent<
         getName(MessageEnum.RestAPIResponceSuccessMessage)
       );
 
+      // Handle null/undefined responses
+      if (!res) {
+        console.warn("⚠️ No response data received");
+        if (apiRequestCallId === this.getDocusignDetailsApiCallId) {
+          this.setState({ documentDetails: [], loader: false });
+        }
+        return;
+      }
+
+      // Handle error responses (404, etc.)
+      if (res.status === 404 || res.error) {
+        console.warn("⚠️ DocuSign status endpoint returned error:", res.error || "Not Found");
+        console.warn("This might be expected if DocuSign hasn't been started yet");
+        if (apiRequestCallId === this.getDocusignDetailsApiCallId) {
+          // Set empty array instead of undefined to prevent React errors
+          this.setState(
+            { documentDetails: [], loader: false },
+            this.checkDocusignStartForAtleast1Doc
+          );
+        }
+        return;
+      }
+
       if (this.isValidResponse(res)) {
         switch (apiRequestCallId) {
           case this.getDocusignDetailsApiCallId:
+            // Ensure documentDetails is always an array
+            const documentDetails = Array.isArray(res.document_signing_status) 
+              ? res.document_signing_status 
+              : [];
             this.setState(
-              { documentDetails: res.document_signing_status, loader: false },
+              { documentDetails, loader: false },
               this.checkDocusignStartForAtleast1Doc
             );
             break;
           case this.startDocuSignApiCallId:
             setStorageData("docusign_envelope_id", res.envelope_id);
             setStorageData("docusign_access_token", res.access_token);
-            this.navigateToDocuSign(res.signing_urls.url);
+            // Handle new API response format with signing_urls_array
+            if (res.signing_urls_array && res.signing_urls_array.length > 0) {
+              // Validate all signing URLs before storing
+              const validSigningUrls = res.signing_urls_array.filter((signer: any) => 
+                this.isValidSigningUrl(signer.signing_url)
+              );
+              
+              if (validSigningUrls.length > 0) {
+                console.log(`✅ Received ${validSigningUrls.length} valid signing URL(s)`);
+                setStorageData("docusign_signing_urls_array", JSON.stringify(validSigningUrls));
+                setStorageData("doc_sign_url", validSigningUrls[0].signing_url);
+                this.navigateToDocuSign(validSigningUrls[0].signing_url);
+              } else {
+                console.error("❌ No valid signing URLs received from API");
+                console.error("Received URLs:", res.signing_urls_array);
+                // Don't navigate - show error instead
+                this.setState({ loader: false });
+              }
+            } else if (res.signing_urls) {
+              // Fallback to single URL format (backward compatibility)
+              const url = typeof res.signing_urls === 'string' ? res.signing_urls : res.signing_urls.url;
+              if (this.isValidSigningUrl(url)) {
+                console.log("✅ Valid signing URL received:", url);
+                setStorageData("doc_sign_url", url);
+                this.navigateToDocuSign(url);
+              } else {
+                console.error("❌ Invalid signing URL received from API:", url);
+                this.setState({ loader: false });
+              }
+            } else {
+              console.error("❌ No signing URLs received from API");
+              this.setState({ loader: false });
+            }
             break;
         }
       }
@@ -192,7 +286,7 @@ export default class DocumentListController extends BlockComponent<
   startDocuSignForThisDoc = async (docId: number) => {
     const bodyData = {
       document_id: docId,
-      base_url: window.location.origin + "/DocuSignSuccess",
+      base_url: window.location.origin, // DocuSign will append /DocuSignSuccess automatically
     };
     this.startDocuSignApiCallId = await this.apiCall({
       contentType: configJSON.startDocuSignApiContentType,
@@ -203,6 +297,20 @@ export default class DocumentListController extends BlockComponent<
   };
 
   navigateToDocuSign = (sender_url: string | null) => {
+    if (!sender_url) {
+      console.error("❌ Cannot navigate: No signing URL provided");
+      this.setState({ loader: false });
+      return;
+    }
+    
+    // Validate URL before storing and navigating
+    if (!this.isValidSigningUrl(sender_url)) {
+      console.error("❌ Cannot navigate: Invalid signing URL:", sender_url);
+      this.setState({ loader: false });
+      return;
+    }
+    
+    console.log("✅ Navigating to DocuSign with valid URL:", sender_url);
     this.setState({ loader: false });
     setStorageData("doc_sign_url", sender_url);
     window.open(window.location.origin + "/DocuSign", "_blank");

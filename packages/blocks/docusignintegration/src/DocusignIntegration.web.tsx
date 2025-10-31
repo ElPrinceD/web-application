@@ -107,7 +107,101 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                       </Typography>
                     </Box>
                   )}
-                  <div id="docusign-container" className="docusignContainer"></div>
+                  {/* Display multiple signers if available */}
+                  {this.state.signingUrlsArray && this.state.signingUrlsArray.length > 0 ? (
+                    this.state.signingUrlsArray.map((signer) => {
+                      // Validate URL before rendering
+                      if (!this.isValidSigningUrl(signer.signing_url)) {
+                        console.error(`❌ Invalid signing URL for signer ${signer.name}:`, signer.signing_url);
+                        return (
+                          <Box key={signer.recipient_id} mb={3} p={2} style={{ backgroundColor: "#fee", border: "1px solid #fcc" }}>
+                            <Typography variant="body1" color="error">
+                              ⚠️ Invalid signing URL for {signer.name} ({signer.email})
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              Please refresh or request a new signing URL from the backend.
+                            </Typography>
+                          </Box>
+                        );
+                      }
+                      
+                      return (
+                        <Box key={signer.recipient_id} mb={3}>
+                          <Typography variant="h6" style={{ marginBottom: "8px" }}>
+                            Signer: {signer.name} ({signer.email})
+                          </Typography>
+                          <Box
+                            style={{
+                              width: "100%",
+                              height: "600px",
+                              border: "none",
+                              borderRadius: "12px",
+                              overflow: "hidden"
+                            }}
+                          >
+                            <iframe
+                              src={signer.signing_url}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                border: "none"
+                              }}
+                              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                              title={`DocuSign signing for ${signer.name}`}
+                              onError={() => {
+                                console.error("❌ Iframe failed to load:", signer.signing_url);
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      );
+                    })
+                  ) : this.state.sender_url ? (
+                    // Single URL case - validate before rendering
+                    this.isValidSigningUrl(this.state.sender_url) ? (
+                      <Box
+                        style={{
+                          width: "100%",
+                          height: "600px",
+                          border: "none",
+                          borderRadius: "12px",
+                          overflow: "hidden"
+                        }}
+                      >
+                        <iframe
+                          src={this.state.sender_url}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            border: "none"
+                          }}
+                          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                          title="DocuSign signing"
+                          onError={() => {
+                            console.error("❌ Iframe failed to load:", this.state.sender_url);
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box p={2} style={{ backgroundColor: "#fee", border: "1px solid #fcc" }}>
+                        <Typography variant="body1" color="error">
+                          ⚠️ Invalid DocuSign signing URL detected
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          The stored URL is not a valid signing URL. Please refresh the page or request a new signing URL.
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary" style={{ marginTop: 8, display: "block" }}>
+                          Invalid URL: {this.state.sender_url}
+                        </Typography>
+                      </Box>
+                    )
+                  ) : (
+                    <Box p={2}>
+                      <Typography variant="body2" color="textSecondary">
+                        No DocuSign signing URL available. Please start the signing process from the document list.
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
 
