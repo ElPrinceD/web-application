@@ -42,7 +42,7 @@ export default class ContactUs extends LandingPageController {
                    />
                   ) : (
                     <>
-                    <Typography data-testid="contactTitle" data-testID="contactTitle" style={webStyles.typo1}>
+                    <Typography data-testid="contactTitle" style={webStyles.typo1}>
                       {this.state.contactData && this.captilFirstWhychoosSubTitle(this.state.contactData?.title)}
                     </Typography>
                     <Typography style={webStyles.typo2} className="contact-h2">

@@ -2126,12 +2126,53 @@ if(path){
     );
   };
 
-  navigateToDocumentOpener = (docUrl: string) => {
-    setStorageData("docUrl", docUrl);
+  navigateToDocumentOpener = async (docUrl: string) => {
+    console.log("🔵 [navigateToDocumentOpener] Called with:", {
+      docUrl,
+      type: typeof docUrl,
+      isNull: docUrl === null,
+      isUndefined: docUrl === undefined,
+      isEmpty: docUrl === "",
+      trimmed: docUrl?.trim()
+    });
+    
+    // ✅ VALIDATION: Check if URL exists
+    if (!docUrl || docUrl.trim() === "") {
+      console.error("❌ [navigateToDocumentOpener] Empty document URL provided");
+      alert("Document URL is missing. Please refresh the page.");
+      return;
+    }
+    
+    // ✅ VALIDATION: Ensure it's a full URL (backend should provide this, but double-check)
+    let fullUrl = docUrl.trim();
+    console.log("🔵 [navigateToDocumentOpener] Trimmed URL:", fullUrl);
+    
+    // If somehow we get a relative URL, convert it (shouldn't happen, but safety net)
+    if (!fullUrl.startsWith("http://") && !fullUrl.startsWith("https://") && !fullUrl.startsWith("data:")) {
+      console.warn("⚠️ [navigateToDocumentOpener] Received relative URL, converting to full URL:", {
+        original: fullUrl,
+        baseURL: baseURL
+      });
+      fullUrl = `${baseURL}${fullUrl.startsWith("/") ? "" : "/"}${fullUrl}`;
+    }
+    
+    console.log("🔵 [navigateToDocumentOpener] Final URL to store:", fullUrl);
+    
+    // Store in localStorage
+    await setStorageData("docUrl", fullUrl);
+    console.log("🔵 [navigateToDocumentOpener] Stored in localStorage. Verifying...");
+    
+    // Verify what was stored
+    const storedUrl = await getStorageData("docUrl");
+    console.log("🔵 [navigateToDocumentOpener] Retrieved from localStorage:", storedUrl);
+    
+    // Navigate to Document route
+    console.log("🔵 [navigateToDocumentOpener] Navigating to Document route...");
     const message = new Message(getName(MessageEnum.NavigationMessage));
     message.addData(getName(MessageEnum.NavigationTargetMessage), "Document");
     message.addData(getName(MessageEnum.NavigationPropsMessage), this.props);
     this.send(message);
+    console.log("🔵 [navigateToDocumentOpener] Navigation message sent");
   };
 
   findTimeValue = (time: Date | null) => {

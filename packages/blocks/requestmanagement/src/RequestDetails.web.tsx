@@ -1984,6 +1984,13 @@ export default class RequestDetailsWeb extends RequestDetailsController {
                                 style={{ padding: "10px" }}
                                 data-testID="viewButton"
                                 onClick={() => {
+                                  console.log("🔵 [DocumentView] Clicked view button for document:", {
+                                    doc_id: doc.doc_id,
+                                    doc_name: doc.doc_name,
+                                    doc_file_url: doc.doc_file_url,
+                                    doc_file_url_type: typeof doc.doc_file_url,
+                                    doc_file_url_length: doc.doc_file_url?.length || 0
+                                  });
                                   this.navigateToDocumentOpener(doc.doc_file_url);
                                 } }
                               >

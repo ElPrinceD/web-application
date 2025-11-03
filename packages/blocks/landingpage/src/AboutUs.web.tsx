@@ -247,7 +247,7 @@ export default class AboutUs extends LandingPageController {
                       <Typography
                         style={{ ...webStyles.groupHeader, color: "#012275" }}
                       >
-                          {this.state.homeData.vision_mission?.vision?.title.toUpperCase()}
+                          {this.state.homeData.vision_mission?.vision?.title?.toUpperCase() || ''}
                       </Typography>
                       <Typography style={webStyles.groupBodySubHeading}>
                       {this.state.homeData.vision_mission?.vision?.description}
@@ -268,7 +268,7 @@ export default class AboutUs extends LandingPageController {
                       <Typography
                         style={{ ...webStyles.groupHeader, color: "#012275" }}
                       >
-                        {this.state.homeData.vision_mission?.mission?.title.toUpperCase()}
+                        {this.state.homeData.vision_mission?.mission?.title?.toUpperCase() || ''}
                       </Typography>
                       <Typography style={webStyles.groupBodySubHeading}>
                       {this.state.homeData.vision_mission?.mission?.description}
@@ -286,7 +286,7 @@ export default class AboutUs extends LandingPageController {
               <Box className="heading" style={{ display: "grid", gap: "12px" }}>
                 <Box>
                   <Typography style={webStyles.cardHeader}>
-                  {this.state.homeData.story?.title.toUpperCase()}
+                  {this.state.homeData.story?.title?.toUpperCase() || ''}
                   </Typography>
                 </Box>
 
@@ -379,7 +379,7 @@ export default class AboutUs extends LandingPageController {
               <Typography
                 style={{ ...webStyles.typo1, textTransform: "uppercase" }}
               >
-                  {this.state.homeData.why_choose_us?.title.toUpperCase()}
+                  {this.state.homeData.why_choose_us?.title?.toUpperCase() || ''}
               </Typography>
               <Typography
                 style={{
@@ -415,7 +415,7 @@ export default class AboutUs extends LandingPageController {
                         color: "#012275",
                       }}
                     >
-              {whyUsPoint?.name.toUpperCase()}
+              {whyUsPoint?.name?.toUpperCase() || ''}
                     </Typography>
                     <Typography style={{ ...webStyles.groupBody }}>
                     {whyUsPoint?.description}
@@ -472,7 +472,7 @@ export default class AboutUs extends LandingPageController {
                           color: "#012275",
                         }}
                       >
-               {whyUsPoint?.name.toUpperCase()}
+               {whyUsPoint?.name?.toUpperCase() || ''}
                       </Typography>
                       <Typography style={{ ...webStyles.groupBody }}>
                       {whyUsPoint?.description}
@@ -493,7 +493,7 @@ export default class AboutUs extends LandingPageController {
                   <Typography
                     style={{ ...webStyles.typo1, textTransform: "uppercase" }}
                   >
-                  {this.state.homeData.why_choose_us?.title.toUpperCase()}
+                  {this.state.homeData.why_choose_us?.title?.toUpperCase() || ''}
                   </Typography>
                   <Typography style={{ ...webStyles.typo21, textAlign: "end" }}>
                   {this.captilFirstWhychoosSubTitle(this.state.homeData.why_choose_us?.subtitle)}
@@ -924,7 +924,7 @@ const webStyles = {
     background: "#F5F9FF",
     width: 270,
     height: 138,
-    boxShadow: "0px 2px 8px 0px #00000014;",
+    boxShadow: "0px 2px 8px 0px #00000014",
   },
 
   cardGrid: {

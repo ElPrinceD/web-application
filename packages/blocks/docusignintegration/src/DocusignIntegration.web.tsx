@@ -107,56 +107,57 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                       </Typography>
                     </Box>
                   )}
-                  {/* Display multiple signers if available */}
-                  {this.state.signingUrlsArray && this.state.signingUrlsArray.length > 0 ? (
-                    this.state.signingUrlsArray.map((signer) => {
-                      // Validate URL before rendering
-                      if (!this.isValidSigningUrl(signer.signing_url)) {
-                        console.error(`❌ Invalid signing URL for signer ${signer.name}:`, signer.signing_url);
-                        return (
-                          <Box key={signer.recipient_id} mb={3} p={2} style={{ backgroundColor: "#fee", border: "1px solid #fcc" }}>
-                            <Typography variant="body1" color="error">
-                              ⚠️ Invalid signing URL for {signer.name} ({signer.email})
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Please refresh or request a new signing URL from the backend.
-                            </Typography>
-                          </Box>
-                        );
-                      }
-                      
+                  {/* Display only the first signer (one signer at a time) */}
+                  {this.state.signingUrlsArray && this.state.signingUrlsArray.length > 0 ? (() => {
+                    // Get only the first signer
+                    const firstSigner = this.state.signingUrlsArray[0];
+                    
+                    // Validate URL before rendering
+                    if (!this.isValidSigningUrl(firstSigner.signing_url)) {
+                      console.error(`❌ Invalid signing URL for signer ${firstSigner.name}:`, firstSigner.signing_url);
                       return (
-                        <Box key={signer.recipient_id} mb={3}>
-                          <Typography variant="h6" style={{ marginBottom: "8px" }}>
-                            Signer: {signer.name} ({signer.email})
+                        <Box mb={3} p={2} style={{ backgroundColor: "#fee", border: "1px solid #fcc" }}>
+                          <Typography variant="body1" color="error">
+                            ⚠️ Invalid signing URL for {firstSigner.name} ({firstSigner.email})
                           </Typography>
-                          <Box
-                            style={{
-                              width: "100%",
-                              height: "600px",
-                              border: "none",
-                              borderRadius: "12px",
-                              overflow: "hidden"
-                            }}
-                          >
-                            <iframe
-                              src={signer.signing_url}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                border: "none"
-                              }}
-                              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-                              title={`DocuSign signing for ${signer.name}`}
-                              onError={() => {
-                                console.error("❌ Iframe failed to load:", signer.signing_url);
-                              }}
-                            />
-                          </Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Please refresh or request a new signing URL from the backend.
+                          </Typography>
                         </Box>
                       );
-                    })
-                  ) : this.state.sender_url ? (
+                    }
+                    
+                    return (
+                      <Box mb={3}>
+                        <Typography variant="h6" style={{ marginBottom: "8px" }}>
+                          Signer: {firstSigner.name} ({firstSigner.email})
+                        </Typography>
+                        <Box
+                          style={{
+                            width: "100%",
+                            height: "600px",
+                            border: "none",
+                            borderRadius: "12px",
+                            overflow: "hidden"
+                          }}
+                        >
+                          <iframe
+                            src={firstSigner.signing_url}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              border: "none"
+                            }}
+                            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                            title={`DocuSign signing for ${firstSigner.name}`}
+                            onError={() => {
+                              console.error("❌ Iframe failed to load:", firstSigner.signing_url);
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    );
+                  })() : this.state.sender_url ? (
                     // Single URL case - validate before rendering
                     this.isValidSigningUrl(this.state.sender_url) ? (
                       <Box

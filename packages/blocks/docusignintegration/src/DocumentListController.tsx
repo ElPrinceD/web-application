@@ -11,6 +11,7 @@ import {
   setStorageData,
   removeStorageData,
 } from "../../../framework/src/Utilities";
+import { baseURL } from "../../../framework/src/config";
 
 export const configJSON = require("./config");
 
@@ -18,6 +19,7 @@ interface ValidResponseType {
   message: object;
   data: object;
   errors: string;
+  status?: number;
 }
 
 interface ApiCallInterface {
@@ -151,6 +153,11 @@ export default class DocumentListController extends BlockComponent<
       // Handle null/undefined responses
       if (!res) {
         console.warn("⚠️ No response data received");
+        console.log("🔵 [DocuSign API] Null response - User role:", {
+          role_id: this.props.roleID,
+          is_notary: this.isNotaryUser(),
+          is_end_user: this.isEndUser()
+        });
         if (apiRequestCallId === this.getDocusignDetailsApiCallId) {
           this.setState({ documentDetails: [], loader: false });
         }
@@ -161,6 +168,12 @@ export default class DocumentListController extends BlockComponent<
       if (res.status === 404 || res.error) {
         console.warn("⚠️ DocuSign status endpoint returned error:", res.error || "Not Found");
         console.warn("This might be expected if DocuSign hasn't been started yet");
+        console.log("🔵 [DocuSign API Error] User role:", {
+          role_id: this.props.roleID,
+          is_notary: this.isNotaryUser(),
+          is_end_user: this.isEndUser(),
+          error: res.error || res.status
+        });
         if (apiRequestCallId === this.getDocusignDetailsApiCallId) {
           // Set empty array instead of undefined to prevent React errors
           this.setState(
@@ -175,9 +188,62 @@ export default class DocumentListController extends BlockComponent<
         switch (apiRequestCallId) {
           case this.getDocusignDetailsApiCallId:
             // Ensure documentDetails is always an array
-            const documentDetails = Array.isArray(res.document_signing_status) 
+            const allDocumentDetails = Array.isArray(res.document_signing_status) 
               ? res.document_signing_status 
               : [];
+            
+            // Deduplicate documents by document_id - keep only one document per document_id
+            // If there are duplicates, prefer the original document (is_original: true) if available
+            const documentMap = new Map<number, any>();
+            allDocumentDetails.forEach((doc: any) => {
+              const docId = doc.document_id;
+              if (!documentMap.has(docId)) {
+                // First occurrence of this document_id - add it
+                documentMap.set(docId, doc);
+              } else {
+                // Duplicate found - prefer original if available
+                const existingDoc = documentMap.get(docId);
+                if (doc.is_original === true && existingDoc.is_original !== true) {
+                  // Current doc is original, existing is not - replace
+                  documentMap.set(docId, doc);
+                }
+                // Otherwise keep the existing one
+              }
+            });
+            
+            // Convert map back to array
+            const documentDetails = Array.from(documentMap.values());
+            
+            // Log document URLs for debugging
+            console.log("🔵 [DocuSign API Response] Received document details:", {
+              total_documents_before_dedup: allDocumentDetails.length,
+              total_documents_after_dedup: documentDetails.length,
+              duplicates_removed: allDocumentDetails.length - documentDetails.length,
+              user_role: this.props.roleID,
+              is_notary: this.isNotaryUser(),
+              is_end_user: this.isEndUser(),
+              documents: documentDetails.map((doc: any) => ({
+                document_id: doc.document_id,
+                file_name: doc.file_name,
+                document_url: doc.document_url,
+                document_url_type: typeof doc.document_url,
+                document_url_length: doc.document_url?.length || 0,
+                is_docusign_start: doc.is_docusign_start,
+                is_original: doc.is_original,
+                will_be_shown_to_user: this.isThisDocumentShown(doc.is_docusign_start)
+              }))
+            });
+            
+            // Log which documents will be shown/hidden
+            const visibleDocs = documentDetails.filter((doc: any) => 
+              this.isThisDocumentShown(doc.is_docusign_start)
+            );
+            const hiddenDocs = documentDetails.filter((doc: any) => 
+              !this.isThisDocumentShown(doc.is_docusign_start)
+            );
+            console.log("🔵 [DocuSign Visibility] Documents visible:", visibleDocs.length, visibleDocs);
+            console.log("🔵 [DocuSign Visibility] Documents hidden:", hiddenDocs.length, hiddenDocs);
+            
             this.setState(
               { documentDetails, loader: false },
               this.checkDocusignStartForAtleast1Doc
@@ -346,7 +412,24 @@ export default class DocumentListController extends BlockComponent<
       : "Sign Now";
 
   isThisDocumentShown = (hasDocuSignStartedForThisDocument: boolean) => {
-    return this.isNotaryUser() || hasDocuSignStartedForThisDocument;
+    // Notaries always see documents
+    if (this.isNotaryUser()) {
+      console.log("🔵 [isThisDocumentShown] Notary user - always showing document");
+      return true;
+    }
+    
+    // End users see documents once DocuSign has started for at least one document
+    // OR if the document itself has DocuSign started
+    // This allows end users to see documents after the notary initiates DocuSign
+    const result = this.state.hasDocusignStartedForEven1Document || hasDocuSignStartedForThisDocument;
+    console.log("🔵 [isThisDocumentShown] End user check:", {
+      is_end_user: this.isEndUser(),
+      role_id: this.props.roleID,
+      has_docusign_started_for_any: this.state.hasDocusignStartedForEven1Document,
+      has_docusign_started_for_this: hasDocuSignStartedForThisDocument,
+      will_show: result
+    });
+    return result;
   };
 
   findSignatories = (noOfSignatories: number) => {
@@ -363,12 +446,53 @@ export default class DocumentListController extends BlockComponent<
     return this.props.roleID === 2;
   };
 
-  navigateToDocumentOpener = (docUrl: string) => {
-    setStorageData("docUrl", docUrl);
+  navigateToDocumentOpener = async (docUrl: string) => {
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Called with:", {
+      docUrl,
+      type: typeof docUrl,
+      isNull: docUrl === null,
+      isUndefined: docUrl === undefined,
+      isEmpty: docUrl === "",
+      trimmed: docUrl?.trim()
+    });
+    
+    // ✅ VALIDATION: Check if URL exists
+    if (!docUrl || docUrl.trim() === "") {
+      console.error("❌ [DocuSign navigateToDocumentOpener] Empty document URL provided");
+      alert("Document URL is missing. Please contact support.");
+      return;
+    }
+    
+    // ✅ VALIDATION: Ensure it's a full URL (backend should provide this, but double-check)
+    let fullUrl = docUrl.trim();
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Trimmed URL:", fullUrl);
+    
+    // If somehow we get a relative URL, convert it (shouldn't happen, but safety net)
+    if (!fullUrl.startsWith("http://") && !fullUrl.startsWith("https://") && !fullUrl.startsWith("data:")) {
+      console.warn("⚠️ [DocuSign navigateToDocumentOpener] Received relative URL, converting to full URL:", {
+        original: fullUrl,
+        baseURL: baseURL
+      });
+      fullUrl = `${baseURL}${fullUrl.startsWith("/") ? "" : "/"}${fullUrl}`;
+    }
+    
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Final URL to store:", fullUrl);
+    
+    // Store in localStorage
+    await setStorageData("docUrl", fullUrl);
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Stored in localStorage. Verifying...");
+    
+    // Verify what was stored
+    const storedUrl = await getStorageData("docUrl");
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Retrieved from localStorage:", storedUrl);
+    
+    // Navigate to Document route
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Navigating to Document route...");
     const message = new Message(getName(MessageEnum.NavigationMessage));
     message.addData(getName(MessageEnum.NavigationTargetMessage), "Document");
     message.addData(getName(MessageEnum.NavigationPropsMessage), this.props);
     this.send(message);
+    console.log("🔵 [DocuSign navigateToDocumentOpener] Navigation message sent");
   };
 
   handleDownload = async (fileUrl: string, fileName: string) => {

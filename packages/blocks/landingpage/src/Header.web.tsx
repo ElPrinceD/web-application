@@ -74,7 +74,7 @@ export default class Header extends LandingPageController {
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap"
               }}
-              data-testID="userName"
+              data-testid="userName"
               variant="body2"
             >
               {this.state.userName}
@@ -289,7 +289,7 @@ export default class Header extends LandingPageController {
                     lineHeight: "21px",
                     cursor: 'pointer'
                   }}
-                  data-testID="userName"
+                  data-testid="userName"
                   variant="body2"
                 >
                   <>

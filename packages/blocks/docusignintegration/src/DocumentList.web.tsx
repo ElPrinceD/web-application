@@ -25,7 +25,7 @@ export default class DocumentList extends DocumentListController {
 
         
         <Loader loading={this.state.loader} />
-        {this.isEndUser() && !this.state.hasDocusignStartedForEven1Document && (
+        {this.isEndUser() && !this.state.hasDocusignStartedForEven1Document && this.state.documentDetails.length === 0 && (
           <>
             <Typography style={webStyle.tabTitle}>
               Document Signing Request
@@ -47,7 +47,7 @@ export default class DocumentList extends DocumentListController {
         )}
         
 
-        {this.areDocumentsShown() && (
+        {(this.areDocumentsShown() || (this.isEndUser() && this.state.documentDetails.length > 0)) && (
           <Box
             display={"flex"}
             flexDirection={"column"}
@@ -142,6 +142,15 @@ export default class DocumentList extends DocumentListController {
                           style={{ padding: "10px" }}
                           data-testID="viewButton"
                           onClick={() => {
+                            console.log("🔵 [DocuSign DocumentView] Clicked view button for document:", {
+                              document_id: document.document_id,
+                              file_name: document.file_name,
+                              document_url: document.document_url,
+                              document_url_type: typeof document.document_url,
+                              document_url_length: document.document_url?.length || 0,
+                              is_docusign_start: document.is_docusign_start,
+                              signing_urls: document.signing_urls
+                            });
                             this.navigateToDocumentOpener(
                               document.document_url
                             );

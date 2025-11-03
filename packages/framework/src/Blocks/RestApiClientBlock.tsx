@@ -88,6 +88,21 @@ export default class RestApiClientBlock<Entity> extends Block {
       );
 
       console.log('Api Response' + JSON.stringify(responseJson));
+      
+      // Special logging for DocuSign status API to debug document URLs
+      if (endpoint && endpoint.includes('docusign_status')) {
+        console.log('🔵🔵🔵 [DocuSign Status API Response] Full Response:', {
+          endpoint: endpoint,
+          response: responseJson,
+          document_signing_status: responseJson?.document_signing_status,
+          document_urls: responseJson?.document_signing_status?.map((doc: any) => ({
+            document_id: doc.document_id,
+            file_name: doc.file_name,
+            document_url: doc.document_url,
+            document_url_type: typeof doc.document_url
+          }))
+        });
+      }
     } catch (error) {
       runEngine.debugLog('RestApiClient Error', error);
       //setting Error
