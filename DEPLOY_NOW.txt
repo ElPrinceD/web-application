@@ -1,0 +1,16 @@
+═══════════════════════════════════════════════════════════════
+  QUICK DEPLOYMENT INSTRUCTIONS
+═══════════════════════════════════════════════════════════════
+
+The frontend has been built and is ready to deploy.
+
+RUN THIS COMMAND:
+
+  cd /Users/michaela/Documents/renotary/web-application
+  ./QUICK_DEPLOY.sh
+
+OR MANUALLY:
+
+  scp -r packages/web/build/* ubuntu@44.212.244.253:/home/ubuntu/frontend/
+
+═══════════════════════════════════════════════════════════════

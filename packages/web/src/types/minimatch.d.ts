@@ -1,5 +1,5 @@
-// Type declaration for minimatch to resolve TypeScript error
+// Type definitions for minimatch to suppress TypeScript errors
 declare module 'minimatch' {
-  const minimatch: any;
-  export = minimatch;
+  export function minimatch(target: string, pattern: string, options?: any): boolean;
+  export default minimatch;
 }

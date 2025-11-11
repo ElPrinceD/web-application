@@ -7,11 +7,15 @@
       "../../node_modules/@types",
       "./src/types"
     ],
+    "types": [
+      "minimatch"
+    ],
     "noEmit": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
+    "noErrorTruncation": true,
     "noImplicitReturns": false,
     "noImplicitThis": false,
     "strict": false

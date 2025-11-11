@@ -940,7 +940,31 @@ export default class RequestManagementController extends BlockComponent<
     }
 
     if (apiRequestCallId === this.getAllNotaryRequestsCallId) {
-      this.handleAllNotaryRequestRes(responseJson,this.state.orderId,this.state.urgencyFilter)
+      // Build filter criteria object from state
+      const filterCriteria = {
+        status: this.state.handleRequestButton !== null 
+          ? this.state.customerRequestButtons[this.state.handleRequestButton]?.toUpperCase() 
+          : null,
+        notaryService: this.state.notary ? parseInt(String(this.state.notary)) : null,
+        priority: this.state.urgencyFilter || null,
+        // Only include dates if dateType is set - otherwise backend handles it
+        startDate: (this.state.dateType && this.state.selectedDate?.[0]) ? this.state.selectedDate[0] : null,
+        endDate: (this.state.dateType && this.state.selectedDate?.[1]) ? this.state.selectedDate[1] : null,
+      };
+      
+      // Use orderId as search input (for searching by order ID)
+      const searchInput = this.state.orderId || '';
+      
+      console.log('🔍 Calling handleAllNotaryRequestRes with:', {
+        hasResponse: !!responseJson,
+        responseKeys: responseJson ? Object.keys(responseJson) : [],
+        searchInput,
+        filterCriteria,
+        currentTab: this.state.value,
+        dateType: this.state.dateType
+      });
+      
+      this.handleAllNotaryRequestRes(responseJson, searchInput, filterCriteria);
     }
 
     if(apiRequestCallId === this.getAllNotaryTypeRequestId) { 
@@ -998,7 +1022,21 @@ export default class RequestManagementController extends BlockComponent<
    };
 
     allRequestAPI = async () => {
-      this.setState({loader: true});
+      // Reset rows and arrays for first page to ensure clean state
+      if (this.state.currentPage === 1) {
+        this.setState({
+          loader: true,
+          rows: [],
+          newRequest: [],
+          ongoingRequest: [],
+          invitedRequest: [],
+          hasMoreRequests: true,
+          noFilterResult: false
+        });
+      } else {
+        this.setState({loader: true});
+      }
+      
       let startDate = "";
       let endDate = "";
 
@@ -1040,7 +1078,7 @@ export default class RequestManagementController extends BlockComponent<
       this.getAllNotaryRequestsCallId = await this.apiCall({
         contentType: configJSON.dashboarContentType,
         method: configJSON.dashboarApiMethodType,
-        endPoint: configJSON.getAllNotaryRequestApiEndpoint
+        endPoint: configJSON.getAllNotaryRequestApiEndpoint + (queryParams.toString() ? `?${queryParams.toString()}` : '')
       });
     };
 
@@ -1191,15 +1229,48 @@ export default class RequestManagementController extends BlockComponent<
       searchInput: string,
       filterCriteria: any
     ) => {
-      if (this.isNoRequestsAvailable(responseJson)) {
-        this.setState({ noFilterResult: true, rows: [],loader:false });
-        return;
+      try {
+        console.log('🔍 handleAllNotaryRequestRes called with:', {
+          hasResponse: !!responseJson,
+          responseKeys: responseJson ? Object.keys(responseJson) : [],
+          searchInput,
+          filterCriteria,
+          currentTab: this.state.value
+        });
+        
+        if (this.isNoRequestsAvailable(responseJson)) {
+          this.setState({ noFilterResult: true, rows: [],loader:false });
+          return;
+        }
+      
+        const requests = this.extractRequests(responseJson);
+        console.log('🔍 Extracted requests:', {
+          newRequests: requests.newRequests.length,
+          ongoingRequests: requests.ongoingRequests.length,
+          invitedRequest: requests.invitedRequest.length,
+          searchInput,
+          filterCriteria,
+          firstRequest: requests.newRequests[0]
+        });
+        
+        const filteredRequests = this.filterRequests(requests, searchInput, filterCriteria);
+        
+        console.log('🔍 Filtered requests:', {
+          filteredNewRequests: filteredRequests.filteredNewRequests.length,
+          filteredOngoingRequests: filteredRequests.filteredOngoingRequests.length,
+          filteredInvitedRequests: filteredRequests.filteredInvitedRequests.length,
+          currentTab: this.state.value,
+          isNotary: this.isNotaryUser(),
+          firstFiltered: filteredRequests.filteredNewRequests[0]
+        });
+      
+        // Reset rows for first page, append for subsequent pages (pagination)
+        const isFirstPage = this.state.currentPage === 1;
+        this.updateStateWithFilteredRequests(filteredRequests, isFirstPage);
+      } catch (error) {
+        console.error('❌ Error in handleAllNotaryRequestRes:', error);
+        this.setState({ loader: false, noFilterResult: true, rows: [] });
       }
-    
-      const requests = this.extractRequests(responseJson);
-      const filteredRequests = this.filterRequests(requests, searchInput, filterCriteria);
-    
-      this.updateStateWithFilteredRequests(filteredRequests);
     };
     
    
@@ -1214,12 +1285,25 @@ export default class RequestManagementController extends BlockComponent<
    
     extractRequests = (responseJson: any) => {
       const isEndUser = this.isEndUser();
+      const newRequests = isEndUser
+        ? responseJson.end_user_notary_requests?.data || []
+        : responseJson.new_notary_requests?.data || [];
+      const ongoingRequests = responseJson.notary_ongoing_requests?.data || [];
+      const invitedRequest = responseJson.invite_request?.data || [];
+      
+      console.log('🔍 extractRequests result:', {
+        isEndUser,
+        newRequestsCount: newRequests.length,
+        ongoingRequestsCount: ongoingRequests.length,
+        invitedRequestCount: invitedRequest.length,
+        responseKeys: Object.keys(responseJson),
+        firstNewRequest: newRequests[0]
+      });
+      
       return {
-        newRequests: isEndUser
-          ? responseJson.end_user_notary_requests?.data || []
-          : responseJson.new_notary_requests?.data || [],
-        ongoingRequests: responseJson.notary_ongoing_requests?.data || [],
-        invitedRequest: responseJson.invite_request?.data || [],
+        newRequests,
+        ongoingRequests,
+        invitedRequest,
       };
     };
     
@@ -1241,14 +1325,37 @@ export default class RequestManagementController extends BlockComponent<
           const { status, notaryService, priority, startDate, endDate } = filterCriteria;
           const attributes = request.attributes;
     
-          return (
-            (!status || attributes.status === status) &&
-            (!notaryService || attributes.notary_service_name === notaryService) &&
-            (!priority || attributes.priority === priority) &&
-            (!startDate || !endDate ||
-              (new Date(attributes.date) >= new Date(startDate) &&
-                new Date(attributes.date) <= new Date(endDate)))
-          );
+          // Filter by status (case-insensitive)
+          const statusMatch = !status || attributes.status?.toUpperCase() === status.toUpperCase();
+          
+          // Filter by service - compare service ID (notary_service_type) with filter
+          const serviceMatch = !notaryService || attributes.notary_service_type === notaryService;
+          
+          // Filter by priority (case-insensitive)
+          const priorityMatch = !priority || attributes.priority?.toUpperCase() === priority.toUpperCase();
+          
+          // Filter by date range - handle date-only comparisons properly
+          const dateMatch = !startDate || !endDate ||
+            (() => {
+              if (!startDate || !endDate) return true;
+              try {
+                const requestDate = new Date(attributes.date);
+                const filterStart = new Date(startDate);
+                const filterEnd = new Date(endDate);
+                
+                // Set time to start/end of day for proper comparison
+                filterStart.setHours(0, 0, 0, 0);
+                filterEnd.setHours(23, 59, 59, 999);
+                requestDate.setHours(0, 0, 0, 0);
+                
+                return requestDate >= filterStart && requestDate <= filterEnd;
+              } catch (e) {
+                console.error('Date filter error:', e);
+                return true; // If date parsing fails, don't filter out
+              }
+            })();
+    
+          return statusMatch && serviceMatch && priorityMatch && dateMatch;
         });
     
       return {
@@ -1263,10 +1370,13 @@ export default class RequestManagementController extends BlockComponent<
       filteredNewRequests,
       filteredOngoingRequests,
       filteredInvitedRequests,
-    }: any) => {
+    }: any, resetRows: boolean = false) => {
       const isNotaryUser = this.isNotaryUser();
+      // Capture current tab value before setState to avoid stale state
+      const currentTabValue = this.state.value;
+      
       let hasFilteredResults:boolean;
-      if(this.state.value === 1){
+      if(currentTabValue === 1){
         hasFilteredResults = filteredInvitedRequests.length > 0;
       }else{
         hasFilteredResults = filteredNewRequests.length > 0 || filteredOngoingRequests.length > 0
@@ -1282,15 +1392,44 @@ export default class RequestManagementController extends BlockComponent<
             1: filteredInvitedRequests,
           };
     
-      this.setState((prevState) => ({
-        ongoingRequest: [...prevState.ongoingRequest, ...filteredOngoingRequests],
-        invitedRequest: [...prevState.invitedRequest, ...filteredInvitedRequests],
-        newRequest: [...prevState.newRequest, ...filteredNewRequests],
-        rows:  [...prevState.rows, ...keyForRow[this.state.value]],
-        loader: false,
-        hasMoreRequests: hasFilteredResults,
-        noFilterResult: !hasFilteredResults,
-      }));
+      this.setState((prevState) => {
+        // Reset arrays for first page, append for pagination
+        const newOngoingRequest = resetRows ? filteredOngoingRequests : [...prevState.ongoingRequest, ...filteredOngoingRequests];
+        const newInvitedRequest = resetRows ? filteredInvitedRequests : [...prevState.invitedRequest, ...filteredInvitedRequests];
+        const newNewRequest = resetRows ? filteredNewRequests : [...prevState.newRequest, ...filteredNewRequests];
+        
+        // Get the rows for the current tab - use captured value to ensure correct tab
+        const currentTabRows = keyForRow[currentTabValue] || [];
+        const newRows = resetRows ? currentTabRows : [...prevState.rows, ...currentTabRows];
+        
+        console.log('🔍 Updating state:', {
+          resetRows,
+          currentTab: currentTabValue,
+          newRowsLength: newRows.length,
+          currentTabRowsLength: currentTabRows.length,
+          keyForRowTab0: keyForRow[0]?.length || 0,
+          keyForRowTab1: keyForRow[1]?.length || 0,
+          keyForRowTab2: keyForRow[2]?.length || 0,
+          filteredNewRequestsLength: filteredNewRequests.length,
+          filteredOngoingRequestsLength: filteredOngoingRequests.length,
+          filteredInvitedRequestsLength: filteredInvitedRequests.length,
+          newNewRequestLength: newNewRequest.length,
+          newOngoingRequestLength: newOngoingRequest.length,
+          newInvitedRequestLength: newInvitedRequest.length,
+          rowsIsArray: Array.isArray(newRows),
+          firstRowHasAttributes: newRows[0]?.attributes ? true : false
+        });
+        
+        return {
+          ongoingRequest: newOngoingRequest,
+          invitedRequest: newInvitedRequest,
+          newRequest: newNewRequest,
+          rows: newRows,
+          loader: false,
+          hasMoreRequests: hasFilteredResults,
+          noFilterResult: !hasFilteredResults,
+        };
+      });
     };
 
     

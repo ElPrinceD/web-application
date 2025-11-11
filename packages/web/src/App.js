@@ -1,7 +1,9 @@
 // App.js - WEB
 import React, { Component } from "react";
 import { View } from "react-native";
-import firebase from 'firebase'
+// Use production Firebase imports (individual modules instead of full package)
+import firebase from 'firebase/app'
+import 'firebase/analytics'
 import { connect } from 'react-firebase'
 import { gapi, loadAuth2, loadGapiInsideDOM } from "gapi-script";
 

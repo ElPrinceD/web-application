@@ -53,10 +53,25 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
 
         console.log("✅ Zoom containers ready, initializing embedded client...");
 
-        // Calculate container dimensions
-        const containerEl = root.closest('.zoomPanel') as HTMLElement || root.parentElement as HTMLElement || root as HTMLElement;
-        const containerWidth = containerEl.offsetWidth;
-        const containerHeight = containerEl.offsetHeight;
+        // Calculate container dimensions - get the actual zoomPanel container
+        const containerEl = root.closest('.zoomPanel') as HTMLElement;
+        if (!containerEl) {
+          console.warn("⚠️ Could not find .zoomPanel container, using root element");
+        }
+        const actualContainer = containerEl || root.parentElement as HTMLElement || root as HTMLElement;
+        
+        // Get the container's computed dimensions
+        const containerRect = actualContainer.getBoundingClientRect();
+        const containerWidth = Math.floor(containerRect.width);
+        // Subtract header height (approximately 57px) to get available video area
+        const containerHeight = Math.floor(containerRect.height - 57);
+        
+        console.log("📐 Container dimensions:", {
+          containerWidth,
+          containerHeight,
+          containerRect: containerRect,
+          zoomPanelFound: !!containerEl
+        });
 
         // Hard constraints to keep Zoom fully sandboxed
         injectScopedZoomCss();
@@ -164,9 +179,49 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
         } catch {}
 
         // Observe size changes on the container to keep Zoom within bounds
-        setupResizeHandling(containerEl);
-        // Dispatch a resize so Zoom recalculates layout
-        safeDispatchResize();
+        setupResizeHandling(actualContainer);
+        
+        // Force resize after a short delay to ensure Zoom SDK has initialized
+        setTimeout(() => {
+          safeDispatchResize();
+          // Also try to update view size if available
+          if (clientRef.current && typeof clientRef.current.setViewSize === "function") {
+            const updatedRect = actualContainer.getBoundingClientRect();
+            const updatedWidth = Math.floor(updatedRect.width);
+            const updatedHeight = Math.floor(updatedRect.height - 57);
+            clientRef.current.setViewSize({ 
+              width: updatedWidth, 
+              height: updatedHeight 
+            });
+            console.log("📐 Updated Zoom view size:", { width: updatedWidth, height: updatedHeight });
+          }
+        }, 1000);
+        
+        // Also force resize after meeting joins
+        setTimeout(() => {
+          safeDispatchResize();
+          // Re-assert styles after Zoom has fully loaded
+          const reassertAfterJoin = () => {
+            const zmRoot = document.getElementById("zmmtg-root");
+            const reactApp = document.getElementById("react-zoom-app");
+            if (zmRoot || reactApp) {
+              [zmRoot, reactApp].forEach((el) => {
+                if (el) {
+                  const style = (el as HTMLElement).style;
+                  style.width = "100%";
+                  style.height = "100%";
+                  style.minWidth = "100%";
+                  style.minHeight = "100%";
+                  style.maxWidth = "100%";
+                  style.maxHeight = "100%";
+                  style.display = "flex";
+                  style.flexDirection = "column";
+                }
+              });
+            }
+          };
+          reassertAfterJoin();
+        }, 3000);
       } catch (err: any) {
         console.error("❌ Zoom initialization error:", err);
         setError(err.message || "Failed to initialize Zoom meeting");
@@ -220,24 +275,51 @@ const EmbeddedZoom: React.FC<EmbeddedZoomProps> = ({
     style.id = styleId;
     style.textContent = `
 #meetingSDKElement,
-#zmmtg-root,
-#react-zoom-app {
+#zoom-container,
+#zoom-meeting-container {
   position: relative !important;
   width: 100% !important;
   height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
   top: 0 !important;
   left: 0 !important;
   z-index: 1 !important;
   resize: none !important;
   overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+#zmmtg-root,
+#react-zoom-app {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  inset: auto !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+/* Force Zoom video container to fill space */
+#zmmtg-root > div,
+#react-zoom-app > div {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
 }
 html, body {
   overflow: auto !important;
   height: auto !important;
-}
-/* Prevent SDK from forcing fixed/fullscreen layouts */
-#zmmtg-root, #react-zoom-app {
-  inset: auto !important;
 }
 /* Protect DocuSign iframe from Zoom interference */
 #docusign-iframe {
@@ -309,10 +391,14 @@ html, body {
           (docusignPanel as HTMLElement).style.opacity = "1";
         }
         
-        // Constrain Zoom elements
+        // Constrain Zoom elements and force them to fill the container
         const zmRoot = document.getElementById("zmmtg-root");
         const reactApp = document.getElementById("react-zoom-app");
-        [zmRoot, reactApp].forEach((el) => {
+        const meetingElement = document.getElementById("meetingSDKElement");
+        const zoomContainer = document.getElementById("zoom-container");
+        const zoomMeetingContainer = document.getElementById("zoom-meeting-container");
+        
+        [meetingElement, zoomContainer, zoomMeetingContainer, zmRoot, reactApp].forEach((el) => {
           if (el) {
             const style = (el as HTMLElement).style;
             if (style.position === "fixed" || style.position === "absolute") {
@@ -323,8 +409,37 @@ html, body {
             style.left = "0";
             style.width = "100%";
             style.height = "100%";
+            style.minWidth = "100%";
+            style.minHeight = "100%";
+            style.maxWidth = "100%";
+            style.maxHeight = "100%";
+            style.display = "flex";
+            style.flexDirection = "column";
+            style.overflow = "hidden";
           }
         });
+        
+        // Force any child divs to also fill space
+        if (zmRoot) {
+          const childDivs = zmRoot.querySelectorAll('div');
+          childDivs.forEach((div) => {
+            const divStyle = (div as HTMLElement).style;
+            divStyle.width = "100%";
+            divStyle.height = "100%";
+            divStyle.minWidth = "100%";
+            divStyle.minHeight = "100%";
+          });
+        }
+        if (reactApp) {
+          const childDivs = reactApp.querySelectorAll('div');
+          childDivs.forEach((div) => {
+            const divStyle = (div as HTMLElement).style;
+            divStyle.width = "100%";
+            divStyle.height = "100%";
+            divStyle.minWidth = "100%";
+            divStyle.minHeight = "100%";
+          });
+        }
       };
 
       const mo = new MutationObserver(() => reassert());
@@ -467,9 +582,32 @@ const ZoomContainerWrapper = styled(Box)({
   flex: 1,
   position: "relative",
   overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  minHeight: 0, // Important for flex children to shrink
   "& #zoom-container": {
     width: "100%",
     height: "100%",
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+  },
+  "& #zoom-meeting-container": {
+    width: "100%",
+    height: "100%",
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+  },
+  "& #meetingSDKElement": {
+    width: "100%",
+    height: "100%",
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
   },
 });
 

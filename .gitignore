@@ -135,4 +135,4 @@ docs/_build/
 
 # Backup files
 *.bak
-*.backup
+*.backuppackages/web/.env.production

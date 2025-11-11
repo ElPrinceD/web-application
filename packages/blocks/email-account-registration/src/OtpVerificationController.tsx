@@ -379,9 +379,15 @@ return true
      this.setState({ loader: true });
      await this.addServiceFunc();
    
+    // Get token from storage if state token is empty
+    let token = this.state.token;
+    if (!token) {
+      token = await getStorageData("token");
+    }
+    
     const header = {
       "Content-Type": "application/json",
-      token: this.state.token
+      token: token
     };
     const bodyData = {
         service_ids: this.state.selectedArrayIds,

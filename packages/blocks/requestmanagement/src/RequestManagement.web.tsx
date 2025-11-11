@@ -987,18 +987,35 @@ export default class RequestManagement extends RequestManagementController {
               </div>
             </MainBox>
             <>
-              
-              {this.state.rows.length !== 0 && (this.isEndUser() || this.isActiveNotaryUser()) ?
-                <>
-                 
-                  {this.renderRequestTable()}
-                </>
-                : 
-                <>
-               
-                {this.renderEmpty()}
-                </>
-              }
+              {(() => {
+                const rowsLength = this.state.rows?.length || 0;
+                const isEndUserCheck = this.isEndUser();
+                const isActiveNotaryUserCheck = this.isActiveNotaryUser();
+                const isNotaryUserCheck = this.isNotaryUser();
+                const isUserActiveCheck = this.state.isUserActive;
+                
+                console.log('🔍 Render condition check:', {
+                  rowsLength,
+                  isEndUser: isEndUserCheck,
+                  isActiveNotaryUser: isActiveNotaryUserCheck,
+                  isNotaryUser: isNotaryUserCheck,
+                  isUserActive: isUserActiveCheck,
+                  roleID: this.state.roleID,
+                  shouldRenderTable: rowsLength !== 0 && (isEndUserCheck || isActiveNotaryUserCheck),
+                  rowsIsArray: Array.isArray(this.state.rows),
+                  firstRow: this.state.rows[0]
+                });
+                
+                return rowsLength !== 0 && (isEndUserCheck || isActiveNotaryUserCheck) ? (
+                  <>
+                    {this.renderRequestTable()}
+                  </>
+                ) : (
+                  <>
+                    {this.renderEmpty()}
+                  </>
+                );
+              })()}
             </>
             <CustomFooter/>
           </MainBox>

@@ -342,18 +342,40 @@ export default class DocumentListController extends BlockComponent<
   ) => {
     this.setState({ loader:true});
     setStorageData("documentId", document.document_id);
+    
+    // Log document details for debugging
+    console.log("🔵 [DocuSign Start] Starting DocuSign with document:", {
+      document_id: document.document_id,
+      file_name: document.file_name,
+      document_url: document.document_url,
+      is_docusign_start: document.is_docusign_start,
+      signing_urls: document.signing_urls
+    });
+    
     if (document.is_docusign_start) {
       this.navigateToDocuSign(document.signing_urls);
     } else {
-      this.startDocuSignForThisDoc(document.document_id);
+      // Pass both document_id and document_url to ensure backend uses correct document
+      this.startDocuSignForThisDoc(document.document_id, document.document_url);
     }
   };
 
-  startDocuSignForThisDoc = async (docId: number) => {
-    const bodyData = {
+  startDocuSignForThisDoc = async (docId: number, documentUrl?: string) => {
+    const bodyData: any = {
       document_id: docId,
       base_url: window.location.origin, // DocuSign will append /DocuSignSuccess automatically
     };
+    
+    // Include document_url if provided to ensure backend uses the correct document
+    if (documentUrl) {
+      bodyData.document_url = documentUrl;
+      console.log("🔵 [DocuSign Start] Including document_url in request:", documentUrl);
+    } else {
+      console.warn("⚠️ [DocuSign Start] No document_url provided, backend will use document_id only");
+    }
+    
+    console.log("🔵 [DocuSign Start] Sending request to backend:", bodyData);
+    
     this.startDocuSignApiCallId = await this.apiCall({
       contentType: configJSON.startDocuSignApiContentType,
       method: configJSON.startDocuSignApiMethodType,

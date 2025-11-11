@@ -5,7 +5,9 @@ import MessageEnum, {
   getName
 } from "../../../framework/src/Messages/MessageEnum";
 import { runEngine } from "../../../framework/src/RunEngine";
-import firebase from "firebase";
+// Use production Firebase imports (individual modules instead of full package)
+import firebase from "firebase/app";
+import "firebase/analytics";
 
 // Customizable Area Start
 // Customizable Area End

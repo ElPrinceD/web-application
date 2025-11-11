@@ -62,16 +62,50 @@ export default class DocusignIntegration extends DocusignIntegrationController {
             border: none;
             border-radius: 12px;
             }
+            /* Ensure DocuSign panel and iframes fill their containers */
+            .docusignPanel {
+              display: flex !important;
+              flex-direction: column !important;
+              height: 100% !important;
+            }
+            .docusignPanel > div {
+              flex: 1 !important;
+              min-height: 0 !important;
+              display: flex !important;
+              flex-direction: column !important;
+            }
+            .docusignPanel iframe {
+              width: 100% !important;
+              height: 100% !important;
+              flex: 1 !important;
+              min-height: 0 !important;
+            }
             /* Ensure Zoom stays contained and does not override page scroll */
             #meetingSDKElement,
+            #zoom-container,
+            #zoom-meeting-container,
             #zmmtg-root,
             #react-zoom-app {
               position: relative !important;
               width: 100% !important;
               height: 100% !important;
+              min-width: 100% !important;
+              min-height: 100% !important;
+              max-width: 100% !important;
+              max-height: 100% !important;
               top: 0 !important;
               left: 0 !important;
               z-index: 1 !important;
+              display: flex !important;
+              flex-direction: column !important;
+            }
+            /* Force Zoom video to fill its container */
+            #zmmtg-root > div,
+            #react-zoom-app > div {
+              width: 100% !important;
+              height: 100% !important;
+              min-width: 100% !important;
+              min-height: 100% !important;
             }
             html, body {
               overflow: auto !important;
@@ -128,14 +162,15 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                     }
                     
                     return (
-                      <Box mb={3}>
-                        <Typography variant="h6" style={{ marginBottom: "8px" }}>
+                      <Box style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+                        <Typography variant="h6" style={{ marginBottom: "8px", padding: "8px" }}>
                           Signer: {firstSigner.name} ({firstSigner.email})
                         </Typography>
                         <Box
                           style={{
                             width: "100%",
-                            height: "600px",
+                            flex: 1,
+                            minHeight: 0,
                             border: "none",
                             borderRadius: "12px",
                             overflow: "hidden"
@@ -146,7 +181,8 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                             style={{
                               width: "100%",
                               height: "100%",
-                              border: "none"
+                              border: "none",
+                              minHeight: "100%"
                             }}
                             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
                             title={`DocuSign signing for ${firstSigner.name}`}
@@ -163,7 +199,9 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                       <Box
                         style={{
                           width: "100%",
-                          height: "600px",
+                          height: "100%",
+                          flex: 1,
+                          minHeight: 0,
                           border: "none",
                           borderRadius: "12px",
                           overflow: "hidden"
@@ -174,7 +212,8 @@ export default class DocusignIntegration extends DocusignIntegrationController {
                           style={{
                             width: "100%",
                             height: "100%",
-                            border: "none"
+                            border: "none",
+                            minHeight: "100%"
                           }}
                           sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
                           title="DocuSign signing"
@@ -277,7 +316,7 @@ const MainBox = styled(Box)({
   "& .sideBySideContainer": {
     display: "flex",
     gap: "16px",
-    height: "calc(100vh - 120px)",
+    height: "calc(100vh - 80px)",
     width: "100%",
     marginBottom: "24px",
   },
@@ -291,6 +330,8 @@ const MainBox = styled(Box)({
     backgroundColor: "#ffffff",
     position: "relative",
     overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
   },
 
   "& .docusignContainer": {
@@ -316,6 +357,8 @@ const MainBox = styled(Box)({
           flexGrow: 0,
           isolation: "isolate",
           contain: "layout style paint",
+          display: "flex",
+          flexDirection: "column",
         },
 
   "& .loadingSpinner": {
@@ -354,7 +397,7 @@ const MainBox = styled(Box)({
 });
 
 const MainContentBox = styled(Box)({
-  height: "calc(100vh - 144px)",
+  height: "calc(100vh - 104px)",
   "@media (min-width: 1025px)": {
     display: "flex",
     justifyContent:"space-between"
